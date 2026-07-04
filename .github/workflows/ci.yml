@@ -1,0 +1,30 @@
+name: Production CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Production Branch
+        run: echo "Running production validation..."
+
+      # Backend tests
+      # Frontend tests
+      # Linting
+      # Security scans
+      # Build
+      # Deployment
