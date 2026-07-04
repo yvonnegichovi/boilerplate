@@ -5,3 +5,13 @@ venv
 .env
 
 .vscode
+
+node_modules
+<<<<<<< HEAD
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+=======
+>>>>>>> 1962d35d79bc1f05f2c77dd383af16bf6b237c5a
