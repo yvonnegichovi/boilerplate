@@ -18,6 +18,23 @@ jobs:
   backend:
     name: Backend Validation
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://user:password@localhost:5432/prod_test_db
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: prod_test_db
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     defaults:
       run:
@@ -31,6 +48,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
 
       - name: Install Python dependencies
         run: |
@@ -39,6 +58,12 @@ jobs:
 
       - name: Run Django system checks
         run: python manage.py check
+
+      - name: Check for missing migrations
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Run tests
+        run: python manage.py test
 
   frontend:
     name: Frontend Build
