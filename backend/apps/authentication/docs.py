@@ -12,7 +12,7 @@ from drf_spectacular.utils import (
     OpenApiParameter,
 )
 from drf_spectacular.types import OpenApiTypes
-from .seriliazers import (
+from .serializers import (
     RegisterSerializer,
     UserSerializer,
     LogoutSerializer,

@@ -3,7 +3,7 @@ Tests for authentication serializers.
 """
 from django.test import TestCase, RequestFactory
 from django.contrib.auth import get_user_model
-from apps.authentication.seriliazers import (
+from ..serializers import (
     RegisterSerializer,
     UserSerializer,
     ChangePasswordSerializer,

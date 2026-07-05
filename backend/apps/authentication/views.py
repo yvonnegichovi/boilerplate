@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
-from .seriliazers import (
+from .serializers import (
     RegisterSerializer,
     UserSerializer,
     ChangePasswordSerializer,

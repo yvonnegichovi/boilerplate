@@ -39,6 +39,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    groups = models.ManyToManyField(
+        'auth.Group',
+        blank=True,
+        related_name='authentication_users',
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        blank=True,
+        related_name='authentication_users',
+        verbose_name='user permissions',
+    )
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
