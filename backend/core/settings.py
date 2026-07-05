@@ -23,8 +23,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "drf_spectacular",
-    "drf_spectacular_sidecar",
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
@@ -64,12 +62,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=config('DATABASE_URL'),
+        default=config('DATABASE_URL', default=''),
         conn_max_age=600,
     )
 }
 
-AUTH_USER_MODEL = 'authentication.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -105,8 +102,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
@@ -132,18 +127,3 @@ CORS_ALLOWED_ORIGINS = config(
     default='http://localhost:5173,http://localhost:3000',
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
-
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'Boilerplate Repository',
-    'DESCRIPTION': (
-        'Full-stack boilerplate demonstrating Django REST Framework, '
-        'SimpleJWT authentication, PostgreSQL, and React + Vite frontend.'
-    ),
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'SWAGGER_UI_DIST': 'SIDECAR',
-    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
-    'REDOC_DIST': 'SIDECAR',
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SECURITY': [{'jwtAuth': []}],
-}
