@@ -1,17 +1,36 @@
-node_modules
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-venv
+# Vite
+.vite/
+dist/
 
+# Environment variables
 .env
+.env.*
+!.env.example
 
-.vscode
-
-node_modules
-<<<<<<< HEAD
-
-# Python bytecode
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-=======
->>>>>>> 1962d35d79bc1f05f2c77dd383af16bf6b237c5a
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+
+# Django
+db.sqlite3
+media/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
