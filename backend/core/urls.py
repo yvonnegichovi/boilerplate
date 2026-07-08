@@ -18,6 +18,7 @@ urlpatterns = [
 
     # API
     path('api/auth/', include('apps.authentication.urls')),
+    path('api/tasks/', include('apps.tasks.urls')),
 
     # OpenApi Schema
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
