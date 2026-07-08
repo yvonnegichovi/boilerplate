@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../context/authStore';
 
 export default function DashboardPage() {
@@ -25,10 +25,17 @@ export default function DashboardPage() {
                 </div>
             </header>
             <main className='dashboard-body'>
-                <div className='card'>
-                    <h2>Auth module</h2>
-                    <p>You are authenticated. More modules coming next (Tasks, Blog, etc).</p>
-                    <pre>{JSON.stringify(user, null, 2)}</pre>
+                <div className='dash-grid'>
+                    <Link to="/tasks" className="dash-card">
+                        <div className='dash-card-icon'>✅</div>
+                        <h2>Tasks</h2>
+                        <p>Create, manage, and track your tasks with priority and due dates.</p>
+                    </Link>
+                    <div className='dash-card dash-card-soon'>
+                        <div className='dash-card-icon'>📝</div>
+                        <h2>Blog <span className='coming-soon'>Coming Soon</span></h2>
+                        <p>Write and publish posts with categories and tags.</p>
+                    </div>
                 </div>
             </main>
         </div>
