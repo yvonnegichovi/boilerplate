@@ -7,7 +7,7 @@ export default function DashboardPage() {
     const navigate = useNavigate()
 
     useEffect(() => { if (!user) fetchMe() }, [])
-    
+
     const handleLogout = async () => {
         await logout()
         navigate('/login')

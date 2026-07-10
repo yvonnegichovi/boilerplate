@@ -1,6 +1,7 @@
 """
 Serilizers for authentication app
 """
+
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers as drf_serializers
@@ -20,16 +21,16 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id',
-            'email',
-            'first_name',
-            'last_name',
-            'full_name',
-            'phone_number',
-            'avatar',
-            'date_joined',
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "full_name",
+            "phone_number",
+            "avatar",
+            "date_joined",
         ]
-        read_only_fields = ['id', 'date_joined']
+        read_only_fields = ["id", "date_joined"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -39,46 +40,48 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'email',
-            'first_name',
-            'last_name',
-            'phone_number',
-            'password',
-            'password_confirm',
+            "email",
+            "first_name",
+            "last_name",
+            "phone_number",
+            "password",
+            "password_confirm",
         ]
 
     def validate(self, attrs):
-        if attrs['password'] != attrs['password_confirm']:
-            raise serializers.ValidationError({'password': 'Password do not match.'})
+        if attrs["password"] != attrs["password_confirm"]:
+            raise serializers.ValidationError({"password": "Password do not match."})
         return attrs
-    
+
     def create(self, validate_data):
-        validate_data.pop('password_confirm')
+        validate_data.pop("password_confirm")
         return User.objects.create_user(**validate_data)
-    
+
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(write_only=True)
-    new_password = serializers.CharField(write_only=True, validators=[validate_password])
+    new_password = serializers.CharField(
+        write_only=True, validators=[validate_password]
+    )
 
     def validate_old_password(self, value):
-        user = self.context['request'].user
+        user = self.context["request"].user
         if not user.check_password(value):
-            raise serializers.ValidationError('Old password is incorrect.')
+            raise serializers.ValidationError("Old password is incorrect.")
         return value
-    
+
     def save(self, **kwargs):
-        user = self.context['request'].user
-        user.set_password(self.validated_data['new_password'])
+        user = self.context["request"].user
+        user.set_password(self.validated_data["new_password"])
         user.save()
         return user
-    
+
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'avatar']
+        fields = ["first_name", "last_name", "avatar"]
 
 
 class LogoutSerializer(serializers.Serializer):
-    refresh = serializers.CharField(help_text='The refresh token to blacklist.')
+    refresh = serializers.CharField(help_text="The refresh token to blacklist.")

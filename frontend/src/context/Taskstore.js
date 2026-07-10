@@ -60,7 +60,7 @@ const useTaskStore = create((set, get) => ({
         }
     },
 
-    clearError: () => set({ error: null }),    
+    clearError: () => set({ error: null }),
 }))
 
 
