@@ -1,0 +1,20 @@
+name: Validate PR to main
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-source-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ensure PR comes from dev
+        run: |
+          if [[ "${{ github.head_ref }}" != "dev" ]]; then
+            echo "Only the dev branch can be merged into main."
+            exit 1
+          fi
+
+          echo "Valid source branch."

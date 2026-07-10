@@ -17,6 +17,7 @@ permissions:
 jobs:
   backend:
     name: Backend Validation
+    needs: pre-commit
     runs-on: ubuntu-latest
 
     services:
@@ -66,6 +67,7 @@ jobs:
 
   frontend:
     name: Frontend Build
+    needs: pre-commit
     runs-on: ubuntu-latest
 
     defaults:
