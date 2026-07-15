@@ -126,13 +126,19 @@ REST_FRAMEWORK = {
  
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Boilerplate API',
-    'DESCRIPTION': 'API documentation for Boilerplate',
+    'DESCRIPTION': (
+        'Full-stack boilerplate demonstrating Django REST Framework, '
+        'SimpleJWT authentication, multi-tenant SaaS architecture, '
+        'PostgreSQL, and React + Vite frontend.'
+    ), 
     'VERSION': '1.0.0',
 
+    'SERVE_INCLUDE_SCHEMA': False,
     'SWAGGER_UI_DIST': 'SIDECAR',
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
-
     'REDOC_DIST': 'SIDECAR',
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SECURITY': [{'jwtAuth': []}],
 }
 
 SIMPLE_JWT = {

@@ -7,6 +7,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from apps.organisations.urls import invitation_patterns
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -19,6 +20,8 @@ urlpatterns = [
     # API
     path('api/auth/', include('apps.authentication.urls')),
     path('api/tasks/', include('apps.tasks.urls')),
+    path('api/organisations/', include('apps.organisations.urls')),
+    path('api/invitations/', include(invitation_patterns)),
 
     # OpenApi Schema
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

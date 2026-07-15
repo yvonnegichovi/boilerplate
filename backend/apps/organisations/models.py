@@ -146,8 +146,7 @@ class Invitation(models.Model):
     def _is_valid(self):
         return self.status == self.Status.PENDING and not self.is_expired
     
-    @property
-    def accepted(self, user):
+    def accept(self, user):
         """
         Accept the invitation. This method should be called when a user accepts the invitation.
         It will create a membership for the user and mark the invitation as accepted.
@@ -161,7 +160,7 @@ class Invitation(models.Model):
             defaults={'role': self.role},
         )
         self.status = self.Status.ACCEPTED
-        self.save(updated_fields=['status'])
+        self.save(update_fields=['status'])
 
     def revoke(self):
         """
@@ -172,4 +171,4 @@ class Invitation(models.Model):
             logger.warning(f"Attempt to revoke a non-pending invitation: {self.id}")
             raise ValueError("Only pending invitations can be revoked.")
         self.status = self.Status.REVOKED
-        self.save(updated_fields=['status'])    
+        self.save(update_fields=['status'])

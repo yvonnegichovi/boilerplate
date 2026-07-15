@@ -239,6 +239,145 @@ body {
 }
 .modal-footer .btn { width: auto; margin-top: 0; }
 
+/* ── Org header / back link ───────────────────────────────────────────── */
+.org-header-title { display: flex; align-items: center; gap: 1rem; }
+.org-back-link {
+  color: var(--color-muted); text-decoration: none;
+  font-size: .875rem; font-weight: 500;
+}
+.org-back-link:hover { color: var(--color-text); }
+
+/* ── Avatars ──────────────────────────────────────────────────────────── */
+.avatar {
+  border-radius: 999px; object-fit: cover; flex-shrink: 0;
+}
+.avatar-initials {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-primary); color: #fff;
+  font-weight: 600; letter-spacing: .02em;
+}
+
+/* ── Organisation grid & cards ────────────────────────────────────────── */
+.org-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.org-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-decoration: none;
+  color: var(--color-text);
+  display: block;
+  transition: box-shadow .15s, border-color .15s;
+}
+.org-card:hover { box-shadow: var(--shadow); border-color: var(--color-primary); }
+.org-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+.org-card-name { font-size: 1.05rem; font-weight: 600; margin-bottom: .25rem; }
+.org-card-meta { font-size: .85rem; color: var(--color-muted); margin: 0; }
+
+/* ── Logo picker (org form) ──────────────────────────────────────────── */
+.logo-field .logo-picker { display: flex; align-items: center; gap: 1rem; }
+.logo-upload-btn { cursor: pointer; }
+
+/* ── Organisation detail header ───────────────────────────────────────── */
+.org-detail-header {
+  display: flex; align-items: center; gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.org-detail-header h1 { font-size: 1.4rem; margin-bottom: .35rem; }
+.org-detail-meta { display: flex; align-items: center; gap: .75rem; color: var(--color-muted); font-size: .875rem; }
+
+/* ── Organisation tabs ────────────────────────────────────────────────── */
+.org-tabs {
+  display: flex; gap: .25rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 1.5rem;
+}
+.org-tab {
+  background: none; border: none; cursor: pointer;
+  padding: .65rem .9rem; margin-bottom: -1px;
+  font-size: .9rem; font-weight: 500; color: var(--color-muted);
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+.org-tab:hover { color: var(--color-text); }
+.org-tab-active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+
+/* ── Overview stats ───────────────────────────────────────────────────── */
+.org-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  display: flex; flex-direction: column; gap: .35rem;
+}
+.stat-value { font-size: 1.4rem; font-weight: 700; }
+.stat-label { font-size: .8rem; color: var(--color-muted); }
+
+/* ── Member list ──────────────────────────────────────────────────────── */
+.member-list { display: flex; flex-direction: column; gap: .6rem; }
+.member-row {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: .85rem 1.1rem;
+}
+.member-info { display: flex; align-items: center; gap: .75rem; flex: 1; min-width: 0; }
+.member-name { font-weight: 600; font-size: .9rem; }
+.member-email { font-size: .8rem; color: var(--color-muted); }
+.member-role select { width: auto; padding: .4rem .6rem; font-size: .85rem; }
+.member-actions { flex-shrink: 0; }
+
+/* ── Invitation list ──────────────────────────────────────────────────── */
+.invitation-list { display: flex; flex-direction: column; gap: .6rem; }
+.invitation-row {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: .85rem 1.1rem;
+}
+.invitation-info { flex: 1; min-width: 0; }
+.invitation-email { font-weight: 600; font-size: .9rem; }
+.invitation-meta { font-size: .8rem; color: var(--color-muted); }
+.invitation-badges { display: flex; gap: .4rem; flex-shrink: 0; }
+
+/* ── Organisation settings ────────────────────────────────────────────── */
+.org-settings { display: flex; flex-direction: column; gap: 1.5rem; max-width: 560px; }
+.settings-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+.settings-section h2 { font-size: 1.05rem; margin-bottom: .4rem; }
+.settings-description { font-size: .875rem; color: var(--color-muted); margin-bottom: 1rem; }
+.settings-danger { border-color: #fca5a5; }
+.settings-danger h2 { color: var(--color-error); }
+
+.btn-delete-solid {
+  background: var(--color-error); color: #fff;
+  padding: .6rem 1.1rem; border-radius: var(--radius);
+  font-size: .9rem; font-weight: 500; border: none; cursor: pointer;
+  transition: background .15s;
+}
+.btn-delete-solid:hover { background: #b91c1c; }
+
+/* ── Role & invite status badges ──────────────────────────────────────── */
+.badge-owner   { background: #fef3c7; color: #b45309; }
+.badge-admin   { background: #eff6ff; color: #2563eb; }
+.badge-member  { background: #f1f5f9; color: #475569; }
+.badge-pending { background: #fffbeb; color: #d97706; }
+
 /* ── Textarea & select base ───────────────────────────────────────────── */
 textarea {
   width: 100%; padding: .6rem .75rem;

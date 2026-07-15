@@ -1,7 +1,7 @@
 """
 OrgMiddleware: resolves the active organisation from the URL.
 
-URL pattern: /api/orgs/{org_slug}/...
+URL pattern: /api/organisations/{org_slug}/...
 
 Attaches `request.org` to every request so views and permissions
 can access the current tenant without repeating the lookup.
@@ -37,7 +37,7 @@ class OrgMiddleware:
         path = request.path_info
         parts = path.strip('/').split('/')
 
-        if len(parts) >= 3 and parts[0] == 'api' and parts[1] == 'orgs':
+        if len(parts) >= 3 and parts[0] == 'api' and parts[1] == 'organisations':
             slug = parts[2]
             try:
                 org = Organisation.objects.get(slug=slug)

@@ -26,6 +26,11 @@ export default function DashboardPage() {
             </header>
             <main className='dashboard-body'>
                 <div className='dash-grid'>
+                    <Link to="/organisations" className="dash-card">
+                        <div className='dash-card-icon'>🏢</div>
+                        <h2>Organisations</h2>
+                        <p>Create organisations, manage members, and send invitations.</p>
+                    </Link>
                     <Link to="/tasks" className="dash-card">
                         <div className='dash-card-icon'>✅</div>
                         <h2>Tasks</h2>

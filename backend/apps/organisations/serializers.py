@@ -33,15 +33,10 @@ class OrganisationSerializer(serializers.ModelSerializer):
         Get the role of the current user in the organisation.
         """
         request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            try:
-                membership = obj.memberships.filter(user=request.user).first()
-                logger.info(f"Membership found for user {request.user.id} in organisation {obj.id}: {membership.role if membership else 'None'}")
-                return membership.role
-            except Membership.DoesNotExist:
-                logger.info(f"No membership found for user {request.user.id} in organisation {obj.id}")
-                pass
-        return None
+        if not request:
+            return None
+        membership = obj.memberships.filter(user=request.user).first()
+        return membership.role if membership else None
     
 
 class OrganisationWriteSerializer(serializers.ModelSerializer):
