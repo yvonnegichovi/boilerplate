@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import useOrgStore from '../context/orgStore'
+import useTaskStore from '../context/Taskstore'
 import useAuthStore from '../context/authStore'
 import Avatar from '../components/organisations/Avatar'
 import RoleBadge from '../components/organisations/RoleBadge'
@@ -8,8 +9,11 @@ import MemberRow from '../components/organisations/MemberRow'
 import InvitationRow from '../components/organisations/InvitationRow'
 import InviteForm from '../components/organisations/InviteForm'
 import OrganisationForm from '../components/organisations/OrganisationForm'
+import TaskCard from '../components/tasks/TaskCard'
+import TaskForm from '../components/tasks/TaskForm'
+import TaskFilters from '../components/tasks/TaskFilters'
 
-const TABS = ['overview', 'members', 'invitations', 'settings']
+const TABS = ['overview', 'tasks', 'members', 'invitations', 'settings']
 
 export default function OrganisationDetailPage() {
     const { slug } = useParams()
@@ -21,20 +25,47 @@ export default function OrganisationDetailPage() {
         fetchOrganisation, fetchMembers, fetchInvitations,
         deleteOrganisation, resetCurrentOrg,
     } = useOrgStore()
+    const {
+        tasks, count: taskCount, stats: taskStats,
+        isLoading: isLoadingTasks, isLoadingStats,
+        fetchTasks, fetchStats, resetTasks,
+    } = useTaskStore()
 
     const [tab, setTab] = useState('overview')
     const [showInviteForm, setShowInviteForm] = useState(false)
     const [showSettingsForm, setShowSettingsForm] = useState(false)
+    const [showTaskForm, setShowTaskForm] = useState(false)
+    const [editingTask, setEditingTask] = useState(null)
+    const [taskFilters, setTaskFilters] = useState({})
 
     useEffect(() => {
         fetchOrganisation(slug)
-        return () => resetCurrentOrg()
+        return () => { resetCurrentOrg(); resetTasks() }
     }, [slug])
 
     useEffect(() => {
         if (tab === 'members') fetchMembers(slug)
         if (tab === 'invitations') fetchInvitations(slug)
+        if (tab === 'overview') fetchStats(slug)
     }, [tab, slug])
+
+    useEffect(() => {
+        if (tab !== 'tasks') return
+        const clean = Object.fromEntries(
+            Object.entries(taskFilters).filter(([, v]) => v !== '')
+        )
+        fetchTasks(clean, slug)
+    }, [tab, slug, taskFilters])
+
+    const handleEditTask = (task) => {
+        setEditingTask(task)
+        setShowTaskForm(true)
+    }
+
+    const handleCloseTaskForm = () => {
+        setShowTaskForm(false)
+        setEditingTask(null)
+    }
 
     const handleLogout = async () => {
         await logout()
@@ -90,23 +121,116 @@ export default function OrganisationDetailPage() {
                 </nav>
 
                 {tab === 'overview' && (
-                    <div className="org-overview">
-                        <div className="stat-card">
-                            <span className="stat-value">{currentOrg.member_count}</span>
-                            <span className="stat-label">Members</span>
+                    <>
+                        <div className="org-overview">
+                            <div className="stat-card">
+                                <span className="stat-value">{currentOrg.member_count}</span>
+                                <span className="stat-label">Members</span>
+                            </div>
+                            <div className="stat-card">
+                                <span className="stat-value">
+                                    {new Date(currentOrg.created_at).toLocaleDateString('en-GB', {
+                                        day: 'numeric', month: 'short', year: 'numeric',
+                                    })}
+                                </span>
+                                <span className="stat-label">Created</span>
+                            </div>
+                            <div className="stat-card">
+                                <span className="stat-value"><RoleBadge role={currentOrg.your_role} /></span>
+                                <span className="stat-label">Your role</span>
+                            </div>
                         </div>
-                        <div className="stat-card">
-                            <span className="stat-value">
-                                {new Date(currentOrg.created_at).toLocaleDateString('en-GB', {
-                                    day: 'numeric', month: 'short', year: 'numeric',
-                                })}
-                            </span>
-                            <span className="stat-label">Created</span>
+ 
+                        <div className="dashboard-section">
+                            <h2 className="dashboard-section-title">Tasks</h2>
+                            {isLoadingStats ? (
+                                <div className="loading">Loading task stats...</div>
+                            ) : !taskStats || taskStats.total === 0 ? (
+                                <div className="tasks-empty">
+                                    <p>No tasks in this organisation yet.</p>
+                                    <button className="btn btn-primary" onClick={() => setTab('tasks')}>
+                                        Go to Tasks
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="org-overview">
+                                        <div className="stat-card">
+                                            <span className="stat-value">{taskStats.total}</span>
+                                            <span className="stat-label">Total tasks</span>
+                                        </div>
+                                        <div className="stat-card">
+                                            <span className="stat-value">{taskStats.by_status.todo}</span>
+                                            <span className="stat-label">To do</span>
+                                        </div>
+                                        <div className="stat-card">
+                                            <span className="stat-value">{taskStats.by_status.in_progress}</span>
+                                            <span className="stat-label">In progress</span>
+                                        </div>
+                                        <div className="stat-card">
+                                            <span className="stat-value">{taskStats.by_status.done}</span>
+                                            <span className="stat-label">Done</span>
+                                        </div>
+                                        <div className={`stat-card ${taskStats.overdue > 0 ? 'stat-card-warning' : ''}`}>
+                                            <span className="stat-value">{taskStats.overdue}</span>
+                                            <span className="stat-label">Overdue</span>
+                                        </div>
+                                    </div>
+ 
+                                    <div className="task-progress-bar" title="Status breakdown">
+                                        {taskStats.by_status.todo > 0 && (
+                                            <div
+                                                className="task-progress-segment task-progress-todo"
+                                                style={{ width: `${(taskStats.by_status.todo / taskStats.total) * 100}%` }}
+                                            />
+                                        )}
+                                        {taskStats.by_status.in_progress > 0 && (
+                                            <div
+                                                className="task-progress-segment task-progress-progress"
+                                                style={{ width: `${(taskStats.by_status.in_progress / taskStats.total) * 100}%` }}
+                                            />
+                                        )}
+                                        {taskStats.by_status.done > 0 && (
+                                            <div
+                                                className="task-progress-segment task-progress-done"
+                                                style={{ width: `${(taskStats.by_status.done / taskStats.total) * 100}%` }}
+                                            />
+                                        )}
+                                    </div>
+                                </>
+                            )}
                         </div>
-                        <div className="stat-card">
-                            <span className="stat-value"><RoleBadge role={currentOrg.your_role} /></span>
-                            <span className="stat-label">Your role</span>
+                    </>
+                )}
+ 
+                {tab === 'tasks' && (
+                    <div>
+                        <div className="tasks-toolbar">
+                            <div className="tasks-count">
+                                {taskCount} {taskCount === 1 ? 'task' : 'tasks'}
+                            </div>
+                            <TaskFilters filters={taskFilters} onChange={setTaskFilters} />
+                            <button className="btn btn-primary tasks-new-btn" onClick={() => setShowTaskForm(true)}>
+                                + New Task
+                            </button>
                         </div>
+ 
+                        {isLoadingTasks ? (
+                            <div className="loading">Loading tasks...</div>
+                        ) : tasks.length === 0 ? (
+                            <div className="tasks-empty">
+                                <p>No tasks yet.</p>
+                                <button className="btn btn-primary" onClick={() => setShowTaskForm(true)}>
+                                    Create your first task
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="task-list">
+                                {tasks.map((task) => (
+                                    <TaskCard key={task.id} task={task} slug={slug} onEdit={handleEditTask} />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 

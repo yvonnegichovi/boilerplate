@@ -1,6 +1,6 @@
 const STATUS_STYLES = {
     todo: 'badge badge-todo',
-    in_progess: 'badge badge-progress',
+    in_progress: 'badge badge-progress',
     done: 'badge badge-done',
 }
 
