@@ -27,10 +27,10 @@ export default function TaskFilters({ filters, onChange }) {
                 value={filters.ordering || '-created_at'}
                 onChange={(e) => handle('ordering', e.target.value)}
             >
-                <option value="created_at">Newest First</option>
+                <option value="-created_at">Newest First</option>
                 <option value="created_at">Oldest First</option>
-                <option value="due_date">Due Date</option>
-                <option value="-due_date">Due Date</option>
+                <option value="due_date">Due Date (soonest)</option>
+                <option value="-due_date">Due Date (latest)</option>
                 <option value="priority">Priority</option>
             </select>
         </div>
