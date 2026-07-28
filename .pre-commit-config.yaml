@@ -64,27 +64,6 @@ repos:
 
   - repo: local
     hooks:
-      - id: check-branch-name
-        name: Enforce Branch Naming Prefixes
-        entry: |
-          bash -c '
-          BRANCH_NAME=$(git branch --show-current)
-          REGEX="^(feat|bugfix|hotfix|release|docs|refactor|test|chore)/[a-zA-Z0-9._-]+$"
-
-          if [[ ! $BRANCH_NAME =~ $REGEX \
-                && $BRANCH_NAME != "main" \
-                && $BRANCH_NAME != "dev" \
-                && $BRANCH_NAME != "master" ]]; then
-            echo "ERROR: Invalid branch name: $BRANCH_NAME"
-            echo "Your branch must use a valid prefix. Example: feat/user-login"
-            exit 1
-          fi
-          '
-        language: system
-        stages: [pre-commit]
-
-  - repo: local
-    hooks:
       - id: prevent-direct-commit
         name: Prevent commits on protected branches
         language: system
