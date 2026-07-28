@@ -24,6 +24,14 @@ class Task(models.Model):
                 on_delete=models.CASCADE,
                 related_name='tasks',
             )
+    organisation = models.ForeignKey(
+                'organisations.Organisation',
+                on_delete=models.CASCADE,
+                null=True,
+                blank=True,
+                related_name='tasks',
+                help_text='If set, this task belongs to an organisation. If null, it is a personal task.',
+            )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.TODO)

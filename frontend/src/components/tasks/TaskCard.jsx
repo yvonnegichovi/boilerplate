@@ -2,12 +2,12 @@ import StatusBadge from './StatusBadge'
 import PriorityBadge from './PriorityBadge'
 import useTaskStore from '../../context/Taskstore'
 
-export default function TaskCard({ task, onEdit }) {
+export default function TaskCard({ task, onEdit, slug }) {
     const { deleteTask } = useTaskStore()
 
     const handleDelete = async () => {
         if (!window.confirm(`Delete "${task.title}"?`)) return
-        await deleteTask(task.id)
+        await deleteTask(task.id, slug)
     }
 
     const formatDate = (d) =>

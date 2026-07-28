@@ -7,15 +7,16 @@ from .models import Task
 
 class TaskSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField(read_only=True)
+    organisation_slug = serializers.CharField(source='organisation.slug', read_only=True, default=None)
 
     class Meta:
         model = Task
         fields = [
-            'id', 'owner', 'title', 'description',
+            'id', 'owner', 'organisation_slug', 'title', 'description',
         'status', 'priority', 'due_date',
         'created_at', 'updated_at',
         ]
-        read_only_fields = ['id', 'owner', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'owner', 'organisation_slug', 'created_at', 'updated_at']
 
 
 class TaskWriteSerializer(serializers.ModelSerializer):

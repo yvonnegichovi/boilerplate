@@ -1,11 +1,24 @@
 """
 Views of the tasks app.
+
+Tasks support two modes, distinguished by whether the request URL is
+org-scoped (/api/organisations/{slug}/tasks/, request.org is set by
+OrgMiddleware) or flat (/api/tasks/, request.org is None):
+
+- Org-scoped: task belongs to `request.org` and is visible to any member
+  of that organisation.
+- Personal: task belongs only to `request.user` (organisation is null).
 """
-from rest_framework import generics, filters
+from django.db.models import Count
+from django.utils import timezone
+from rest_framework import generics, filters, permissions, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from .models import Task
 from .serializers import TaskSerializer, TaskWriteSerializer
+from apps.organisations.permissions import IsOrgMember
 from .docs import (
     TASKS_TAG,
     TASK_FILTERS,
@@ -39,10 +52,18 @@ class TaskListCreateView(generics.ListCreateAPIView):
     ordering_fields  = ['due_date', 'created_at', 'priority']
     ordering         = ['-created_at']
 
+    def get_permissions(self):
+        if getattr(self.request, 'org', None):
+            return [permissions.IsAuthenticated(), IsOrgMember()]
+        return [permissions.IsAuthenticated()]
+
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Task.objects.none()
-        return Task.objects.filter(owner=self.request.user)
+        org = getattr(self.request, 'org', None)
+        if org:
+            return Task.objects.filter(organisation=org)
+        return Task.objects.filter(owner=self.request.user, organisation__isnull=True)
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -50,7 +71,16 @@ class TaskListCreateView(generics.ListCreateAPIView):
         return TaskSerializer
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save(owner=self.request.user, organisation=getattr(self.request, 'org', None))
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(
+            TaskSerializer(serializer.instance, context=self.get_serializer_context()).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 @extend_schema_view(
@@ -78,10 +108,18 @@ class TaskListCreateView(generics.ListCreateAPIView):
 class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
     http_method_names = ['get', 'patch', 'delete', 'head', 'options']
 
+    def get_permissions(self):
+        if getattr(self.request, 'org', None):
+            return [permissions.IsAuthenticated(), IsOrgMember()]
+        return [permissions.IsAuthenticated()]
+
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Task.objects.none()
-        return Task.objects.filter(owner=self.request.user)
+        org = getattr(self.request, 'org', None)
+        if org:
+            return Task.objects.filter(organisation=org)
+        return Task.objects.filter(owner=self.request.user, organisation__isnull=True)
 
     def get_serializer_class(self):
         if self.request.method == 'PATCH':
@@ -89,4 +127,57 @@ class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
         return TaskSerializer
 
     def perform_update(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save()
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(TaskSerializer(serializer.instance, context=self.get_serializer_context()).data)
+
+
+@extend_schema(
+    tags=TASKS_TAG,
+    summary='Task stats',
+    description=(
+        'Returns aggregate counts for the current task scope: total tasks, '
+        'a breakdown by status and by priority, and the number of overdue '
+        'tasks (past due date and not done). Scoped to the organisation when '
+        'called via /organisations/{slug}/tasks/stats/, otherwise scoped to '
+        "the authenticated user's personal tasks."
+    ),
+)
+class TaskStatsView(APIView):
+    """GET /tasks/stats/ (or /organisations/{slug}/tasks/stats/) - aggregate task counts."""
+
+    def get_permissions(self):
+        if getattr(self.request, 'org', None):
+            return [permissions.IsAuthenticated(), IsOrgMember()]
+        return [permissions.IsAuthenticated()]
+
+    def get(self, request, *args, **kwargs):
+        org = getattr(request, 'org', None)
+        if org:
+            qs = Task.objects.filter(organisation=org)
+        else:
+            qs = Task.objects.filter(owner=request.user, organisation__isnull=True)
+
+        by_status = {choice: 0 for choice, _ in Task.Status.choices}
+        by_priority = {choice: 0 for choice, _ in Task.Priority.choices}
+        for row in qs.values('status').annotate(count=Count('id')):
+            by_status[row['status']] = row['count']
+        for row in qs.values('priority').annotate(count=Count('id')):
+            by_priority[row['priority']] = row['count']
+
+        overdue = qs.filter(
+            due_date__lt=timezone.now().date(),
+        ).exclude(status=Task.Status.DONE).count()
+
+        return Response({
+            'total': qs.count(),
+            'by_status': by_status,
+            'by_priority': by_priority,
+            'overdue': overdue,
+        })

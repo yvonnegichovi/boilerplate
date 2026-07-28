@@ -2,7 +2,7 @@ import { useEffect } from "react"
 import { useForm } from 'react-hook-form'
 import useTaskStore from "../../context/Taskstore"
 
-export default function TaskForm({ task = null, onClose }) {
+export default function TaskForm({ task = null, onClose, slug }) {
     const { createTask, updateTask, isSubmitting } = useTaskStore()
     const isEditing = !!task
 
@@ -24,8 +24,8 @@ export default function TaskForm({ task = null, onClose }) {
         if (!data.due_date) delete data.due_date
 
         const result = isEditing
-            ? await updateTask(task.id, data)
-            : await createTask(data)
+            ? await updateTask(task.id, data, slug)
+            : await createTask(data, slug)
 
         if (result.success) onClose()
     }

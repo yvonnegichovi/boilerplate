@@ -10,9 +10,9 @@ const useAuthStore = create((set, get) => ({
     register: async (FormData) => {
         set({ isLoading: true, error: null })
         try {
-            const { data } = await authApi.register(formData)
+            const { data } = await authApi.register(FormData)
             localStorage.setItem('access_token', data.tokens.access)
-            localStorage.setItem('refresh_token', data.token.refresh)
+            localStorage.setItem('refresh_token', data.tokens.refresh)
             set({ user: data.user, isAuthenticated: true, isLoading: false })
             return { success: true }
         } catch (err) {

@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'apps.authentication',
     'apps.tasks',
+    'apps.organisations',
 ]
 
 AUTH_USER_MODEL = 'authentication.User'
@@ -43,6 +44,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apps.organisations.middleware.OrgMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -125,13 +127,19 @@ REST_FRAMEWORK = {
  
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Boilerplate API',
-    'DESCRIPTION': 'API documentation for Boilerplate',
+    'DESCRIPTION': (
+        'Full-stack boilerplate demonstrating Django REST Framework, '
+        'SimpleJWT authentication, multi-tenant SaaS architecture, '
+        'PostgreSQL, and React + Vite frontend.'
+    ), 
     'VERSION': '1.0.0',
 
+    'SERVE_INCLUDE_SCHEMA': False,
     'SWAGGER_UI_DIST': 'SIDECAR',
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
-
     'REDOC_DIST': 'SIDECAR',
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SECURITY': [{'jwtAuth': []}],
 }
 
 SIMPLE_JWT = {
