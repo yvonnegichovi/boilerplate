@@ -3,11 +3,12 @@ Integration tests for authentication API endpoints.
 Tests the full request/response cycle for every endpoint.
 """
 
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import get_user_model
-from .factories import make_user, DEFAULT_PASSWORD
+
+from .factories import DEFAULT_PASSWORD, make_user
 
 User = get_user_model()
 

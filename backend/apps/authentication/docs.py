@@ -4,17 +4,14 @@ Authentication API documentation.
 All @extend_schema decorators live here to keep views.py clean.
 """
 
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiExample,
-    OpenApiResponse,
-)
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
+
 from .serializers import (
-    RegisterSerializer,
-    UserSerializer,
-    LogoutSerializer,
     ChangePasswordSerializer,
+    LogoutSerializer,
+    RegisterSerializer,
     UpdateProfileSerializer,
+    UserSerializer,
 )
 
 AUTH_TAG = ["Authentication"]

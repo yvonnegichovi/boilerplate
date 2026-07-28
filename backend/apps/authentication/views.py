@@ -2,31 +2,30 @@
 Views for authentication app.
 """
 
-from rest_framework import generics, status, permissions
+from drf_spectacular.utils import OpenApiResponse, extend_schema
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
-from drf_spectacular.utils import extend_schema, OpenApiResponse
-
-from .serializers import (
-    RegisterSerializer,
-    UserSerializer,
-    ChangePasswordSerializer,
-    LogoutSerializer,
-    UpdateProfileSerializer,
-)
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .docs import (
-    register_docs,
-    login_docs,
-    logout_docs,
-    me_retrieve_docs,
-    me_put_docs,
-    me_update_docs,
     change_password_docs,
     change_password_patch_docs,
+    login_docs,
+    logout_docs,
+    me_put_docs,
+    me_retrieve_docs,
+    me_update_docs,
+    register_docs,
+)
+from .serializers import (
+    ChangePasswordSerializer,
+    LogoutSerializer,
+    RegisterSerializer,
+    UpdateProfileSerializer,
+    UserSerializer,
 )
 
 

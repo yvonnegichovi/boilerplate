@@ -3,10 +3,12 @@ Views tests for the tasks app.
 """
 
 from datetime import date, timedelta
+
+from apps.authentication.tests.factories import make_user
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
-from apps.authentication.tests.factories import make_user
+
 from ..models import Task
 from .factories import make_task
 

@@ -10,20 +10,18 @@ OrgMiddleware) or flat (/api/tasks/, request.org is None):
 - Personal: task belongs only to `request.user` (organisation is null).
 """
 
+from apps.organisations.permissions import IsOrgMember
 from django.db.models import Count
 from django.utils import timezone
-from rest_framework import generics, filters, permissions, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import filters, generics, permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .docs import TASK_FILTERS, TASKS_TAG
 from .models import Task
 from .serializers import TaskSerializer, TaskWriteSerializer
-from apps.organisations.permissions import IsOrgMember
-from .docs import (
-    TASKS_TAG,
-    TASK_FILTERS,
-)
 
 
 @extend_schema_view(

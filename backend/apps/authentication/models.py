@@ -2,13 +2,14 @@
 Models file for authentication
 """
 
+import uuid
+
 from django.contrib.auth.models import (
     AbstractBaseUser,
-    PermissionsMixin,
     BaseUserManager,
+    PermissionsMixin,
 )
 from django.db import models
-import uuid
 
 
 class UserManager(BaseUserManager):

@@ -3,12 +3,13 @@ Tests for the organisations model.
 """
 
 from datetime import timedelta
+
+from apps.authentication.tests.factories import make_user
 from django.test import TestCase
 from django.utils import timezone
 
-from apps.authentication.tests.factories import make_user
-from .factories import make_organisation, make_membership, make_invitation
 from ..models import Invitation, Membership, Organisation
+from .factories import make_invitation, make_membership, make_organisation
 
 
 class OrganisationModelTests(TestCase):

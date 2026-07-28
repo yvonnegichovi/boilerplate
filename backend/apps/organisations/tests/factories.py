@@ -3,8 +3,9 @@ Test factories for the organisations app.
 """
 
 from apps.authentication.tests.factories import make_user
-from ..models import Organisation, Invitation, Membership
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from ..models import Invitation, Membership, Organisation
 
 
 def make_organisation(created_by=None, **kwargs):

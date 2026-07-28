@@ -3,9 +3,11 @@ Test for the User model and UserManager.
 """
 
 import uuid
-from django.test import TestCase
+
 from django.contrib.auth import get_user_model
-from .factories import make_user, make_superuser, DEFAULT_PASSWORD
+from django.test import TestCase
+
+from .factories import DEFAULT_PASSWORD, make_superuser, make_user
 
 User = get_user_model()
 

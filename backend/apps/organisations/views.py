@@ -3,41 +3,42 @@ Organisation views.
 """
 
 import logging
-from rest_framework import generics, status, permissions
-from rest_framework.response import Response
-from rest_framework.views import APIView
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .models import Organisation, Membership, Invitation
-from .permissions import IsOrgOwner, IsOrgMember, IsOrgAdmin
-from .serializers import (
-    OrganisationSerializer,
-    OrganisationWriteSerializer,
-    MembershipSerializer,
-    UpdateMemberRoleSerializer,
-    InvitationSerializer,
-    CreateInvitationSerializer,
-    AcceptInvitationSerializer,
-    InviteDetailsSerializer,
-)
 from .docs import (
-    org_create_docs,
-    org_delete_docs,
-    org_list_docs,
-    org_retrieve_docs,
-    org_update_docs,
-    member_delete_docs,
-    member_list_docs,
-    member_update_docs,
     invitation_create_docs,
     invitation_delete_docs,
     invitation_list_docs,
     invite_accept_docs,
     invite_preview_docs,
+    member_delete_docs,
+    member_list_docs,
+    member_update_docs,
+    org_create_docs,
+    org_delete_docs,
+    org_list_docs,
+    org_retrieve_docs,
+    org_update_docs,
 )
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from .models import Invitation, Membership, Organisation
+from .permissions import IsOrgAdmin, IsOrgMember, IsOrgOwner
+from .serializers import (
+    AcceptInvitationSerializer,
+    CreateInvitationSerializer,
+    InvitationSerializer,
+    InviteDetailsSerializer,
+    MembershipSerializer,
+    OrganisationSerializer,
+    OrganisationWriteSerializer,
+    UpdateMemberRoleSerializer,
+)
 
 User = get_user_model()
 
@@ -129,7 +130,10 @@ class MemberListView(generics.ListAPIView):
     update=extend_schema(exclude=True),
 )
 class MemberDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """GET /api/organisations/{org_id}/memberships/{user_id}/ - retrieve, update or delete a membership."""
+    """
+    GET /api/organisations/{org_id}/memberships/{user_id}/
+    - retrieve, update or delete a membership.
+    """
 
     http_method_names = ["patch", "delete", "head", "options"]
     permission_classes = [permissions.IsAuthenticated, IsOrgAdmin]
@@ -281,7 +285,8 @@ class InviteAcceptView(APIView):
             if User.objects.filter(email=invite.email).exists():
                 return Response(
                     {
-                        "detail": "An account with this email already exists. Please log in first, then accept the invitation."
+                        "detail": "An account with this email already exists. Please log in first,"
+                        "then accept the invitation."
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )

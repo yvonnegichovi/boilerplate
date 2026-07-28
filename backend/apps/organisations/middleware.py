@@ -11,7 +11,9 @@ If the URL has no org slug -> request.org is None (public routes).
 """
 
 import logging
+
 from django.http import Http404
+
 from .models import Organisation
 
 logger = logging.getLogger(__name__)
@@ -32,7 +34,8 @@ class OrgMiddleware:
 
     def _resolve_org(self, request):
         """
-        Extracts the organisation slug from the URL and attaches the corresponding Organisation object to the request.
+        Extracts the organisation slug from the URL and attaches the corresponding
+        Organisation object to the request.
         If the slug doesn't exist, raises Http404.
         If the URL has no org slug, sets request.org to None (public routes).
         """

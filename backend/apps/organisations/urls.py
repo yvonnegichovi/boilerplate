@@ -2,16 +2,17 @@
 Urls for the organisation app.
 """
 
-from django.urls import path, include
+from django.urls import include, path
+
 from .views import (
-    OrganisationDetailView,
-    OrganisationalListCreateView,
-    MemberDetailView,
-    MemberListView,
     InvitationListCreateView,
     InvitationRevokeView,
-    InvitePreviewView,
     InviteAcceptView,
+    InvitePreviewView,
+    MemberDetailView,
+    MemberListView,
+    OrganisationalListCreateView,
+    OrganisationDetailView,
 )
 
 org_detail_patterns = [

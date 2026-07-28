@@ -2,15 +2,16 @@
 Tests for authentication serializers.
 """
 
-from django.test import TestCase, RequestFactory
 from django.contrib.auth import get_user_model
+from django.test import RequestFactory, TestCase
+
 from ..serializers import (
-    RegisterSerializer,
-    UserSerializer,
     ChangePasswordSerializer,
+    RegisterSerializer,
     UpdateProfileSerializer,
+    UserSerializer,
 )
-from .factories import make_user, DEFAULT_PASSWORD
+from .factories import DEFAULT_PASSWORD, make_user
 
 User = get_user_model()
 

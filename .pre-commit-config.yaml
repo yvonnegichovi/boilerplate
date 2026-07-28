@@ -2,10 +2,16 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
-      - id: check-yaml
-      - id: end-of-file-fixer
       - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+        exclude: ^frontend/(package-lock\.json|tsconfig.*\.json)$
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
       - id: check-merge-conflict
+      - id: debug-statements
+      - id: mixed-line-ending
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.7
@@ -18,6 +24,8 @@ repos:
     rev: 24.4.2
     hooks:
       - id: black
+        files: ^backend/
+        exclude: /migrations/
 
   - repo: local
     hooks:
@@ -26,6 +34,22 @@ repos:
         entry: "bash -c 'if git diff --cached --name-only | grep models.py; then echo -e \"\\033[1;33m⚠️  REMEMBER: Make and apply migrations! ⚠️\\033[0m\"; fi'"
         language: system
         files: \.py$
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        files: ^backend/
+        exclude: /migrations/
+        args: ["--profile", "black"]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.0
+    hooks:
+      - id: flake8
+        files: ^backend/
+        exclude: /migrations/
+        args: ["--max-line-length=100", "--extend-ignore=E203,W503"]
 
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.2.0

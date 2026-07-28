@@ -1,13 +1,13 @@
-from django.test import TestCase, RequestFactory
-
 from apps.authentication.tests.factories import make_user
+from django.test import RequestFactory, TestCase
+
 from ..models import Membership
 from ..serializers import (
+    AcceptInvitationSerializer,
+    CreateInvitationSerializer,
     OrganisationSerializer,
     OrganisationWriteSerializer,
     UpdateMemberRoleSerializer,
-    CreateInvitationSerializer,
-    AcceptInvitationSerializer,
 )
 from .factories import make_invitation, make_membership, make_organisation
 

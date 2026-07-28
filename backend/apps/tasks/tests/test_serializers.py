@@ -3,8 +3,10 @@ Serializers test for the tasks app.
 """
 
 from datetime import date, timedelta
-from django.test import TestCase
+
 from apps.authentication.tests.factories import make_user
+from django.test import TestCase
+
 from ..serializers import TaskWriteSerializer
 
 

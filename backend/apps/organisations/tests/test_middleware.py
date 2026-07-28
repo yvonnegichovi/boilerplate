@@ -1,6 +1,6 @@
-from django.test import TestCase, RequestFactory
-
 from apps.authentication.tests.factories import make_user
+from django.test import RequestFactory, TestCase
+
 from ..middleware import OrgMiddleware
 from .factories import make_organisation
 

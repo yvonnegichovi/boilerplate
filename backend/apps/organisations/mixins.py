@@ -7,6 +7,7 @@ It enforces that no engineer can accidentally forget to filter by tenant.
 """
 
 import logging
+
 from rest_framework.exceptions import NotFound
 
 logger = logging.getLogger(__name__)
@@ -16,7 +17,8 @@ class TenantQuerysetMixin:
     """
     Mixin that scopes every querysets to request.org.
 
-    Subclasses must implement get_base_queryset() instead of get_queryset() to provide the base queryset.
+    Subclasses must implement get_base_queryset() instead of get_queryset()
+    to provide the base queryset.
     This mixin adds the org filter automatically.
     """
 

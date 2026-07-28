@@ -2,9 +2,11 @@
 Sets up a task for an owner for test.
 """
 
-from apps.authentication.tests.factories import make_user
-from ..models import Task
 from datetime import date, timedelta
+
+from apps.authentication.tests.factories import make_user
+
+from ..models import Task
 
 
 def make_task(owner=None, **kwargs):

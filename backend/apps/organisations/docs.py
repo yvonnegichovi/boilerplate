@@ -2,7 +2,7 @@
 Organisations API documentation constants.
 """
 
-from drf_spectacular.utils import extend_schema, OpenApiResponse
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 
 ORG_TAG = ["Organisations"]
 INVITE_TAG = ["Invitations"]
@@ -80,7 +80,9 @@ member_update_docs = extend_schema(
 member_delete_docs = extend_schema(
     tags=ORG_TAG,
     summary="Remove member",
-    description="Removes a member from the organisation. Admin or owner only. Cannot remove the owner.",
+    description=(
+        "Removes a member from the organisation. Admin or owner only. Cannot remove the owner."
+    ),
     responses={
         204: OpenApiResponse(description="Mmember removed."),
         400: OpenApiResponse(description="Cannot remove owner."),
@@ -122,7 +124,9 @@ invitation_delete_docs = extend_schema(
 invite_preview_docs = extend_schema(
     tags=INVITE_TAG,
     summary="Preview invitation",
-    description="Returns invitation details for a given token. Public endpoint - no authentication required.",
+    description=(
+        "Returns invitation details for a given token. Public endpoint - no auth required.",
+    ),
     responses={
         200: OpenApiResponse(description="Invitation detail."),
         404: OpenApiResponse(description="Invalid token."),

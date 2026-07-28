@@ -3,17 +3,20 @@ Models for organisations app.
 
 Architecture:
 - Organisation: the tenant. Every resource belongs to an organisation.
-- Membership: the link between a User and an Organisation. It defines the role of the user in the organisation.
-- Invitationn : a token-based invite that allows anyone (with or without an account) to join an organisation.
+- Membership: the link between a User and an Organisation.
+            It defines the role of the user in the organisation.
+- Invitationn : a token-based invite that allows anyone (with or without an account)
+            to join an organisation.
 """
 
 import logging
-import uuid
 import secrets
-from django.db import models
-from django.conf import settings
-from django.utils import timezone
+import uuid
 from datetime import timedelta
+
+from django.conf import settings
+from django.db import models
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +100,8 @@ def _invitation_token():
 
 class Invitation(models.Model):
     """
-    An invitation is a token-based invite that allows anyone (with or without an account) to join an organisation.
+    An invitation is a token-based invite that allows anyone (with or without an account)
+    to join an organisation.
     """
 
     class Status(models.TextChoices):
@@ -166,7 +170,8 @@ class Invitation(models.Model):
 
     def revoke(self):
         """
-        Revoke the invitation. This method should be called when an admin wants to revoke an invitation.
+        Revoke the invitation.
+        This method should be called when an admin wants to revoke an invitation.
         It will mark the invitation as revoked.
         """
         if self.status != self.Status.PENDING:

@@ -1,11 +1,12 @@
 from datetime import timedelta
+
+from apps.authentication.tests.factories import make_user
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from apps.authentication.tests.factories import make_user
-from ..models import Organisation, Membership, Invitation
-from .factories import make_organisation, make_membership, make_invitation, auth_client
+from ..models import Invitation, Membership, Organisation
+from .factories import auth_client, make_invitation, make_membership, make_organisation
 
 LIST_URL = "/api/organisations/"
 

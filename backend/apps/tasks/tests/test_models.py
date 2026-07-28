@@ -3,9 +3,11 @@ Test tasks model
 """
 
 import uuid
-from django.test import TestCase
+
 from apps.authentication.tests.factories import make_user
 from apps.tasks.models import Task
+from django.test import TestCase
+
 from .factories import make_task
 
 

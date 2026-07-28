@@ -3,8 +3,8 @@ Tasks API documentation constants.
 Shared values imported by views.py and used inline with extend_schema.
 """
 
-from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter
 
 TASKS_TAG = ["Tasks"]
 
@@ -29,7 +29,9 @@ TASK_FILTERS = [
         name="ordering",
         type=OpenApiTypes.STR,
         location=OpenApiParameter.QUERY,
-        description="Order results: `due_date`, `-due_date`, `created_at`, `-created_at`, `priority`",
+        description=(
+            "Order results: `due_date`, `-due_date`, `created_at`, `-created_at`, `priority`"
+        ),
         required=False,
     ),
 ]

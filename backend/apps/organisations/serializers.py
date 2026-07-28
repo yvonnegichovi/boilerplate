@@ -3,10 +3,12 @@ Serializers for the organisations app.
 """
 
 import logging
-from rest_framework import serializers
+
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
-from .models import Organisation, Membership, Invitation
+from rest_framework import serializers
+
+from .models import Invitation, Membership, Organisation
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -172,7 +174,7 @@ class InvitationSerializer(serializers.ModelSerializer):
         org = self.context["request"].org
         if Membership.objects.filter(user__email=value, organisation=org).exists():
             logger.debug(
-                f"Attempted to invite existing member with email '{value}' to organisation {org.id}."
+                f"Attempted to invite existing member with email '{value}' to org {org.id}."
             )
             raise serializers.ValidationError(
                 "This user is already a member of the organisation."
@@ -199,7 +201,7 @@ class CreateInvitationSerializer(serializers.ModelSerializer):
             organisation=org,
         ).exists():
             logger.debug(
-                f"Attempted to invite existing member with email '{value}' to organisation {org.id}."
+                f"Attempted to invite existing member with email '{value}' to org {org.id}."
             )
             raise serializers.ValidationError(
                 "This user is already a member of the organisation."
