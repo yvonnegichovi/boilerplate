@@ -76,7 +76,7 @@ describe('useTaskStore', () => {
         expect(useTaskStore.getState().tasks).toEqual([{ id: 't2' }])
         expect(useTaskStore.getState().count).toBe(1)
     })
-    
+
     it('resetTasks clears tasks, count and stats', () => {
         useTaskStore.setState({ tasks: [{}], count: 5, stats: { total: 5 } })
         useTaskStore.getState().resetTasks()

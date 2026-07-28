@@ -140,7 +140,7 @@ export default function OrganisationDetailPage() {
                                 <span className="stat-label">Your role</span>
                             </div>
                         </div>
- 
+
                         <div className="dashboard-section">
                             <h2 className="dashboard-section-title">Tasks</h2>
                             {isLoadingStats ? (
@@ -176,7 +176,7 @@ export default function OrganisationDetailPage() {
                                             <span className="stat-label">Overdue</span>
                                         </div>
                                     </div>
- 
+
                                     <div className="task-progress-bar" title="Status breakdown">
                                         {taskStats.by_status.todo > 0 && (
                                             <div
@@ -202,7 +202,7 @@ export default function OrganisationDetailPage() {
                         </div>
                     </>
                 )}
- 
+
                 {tab === 'tasks' && (
                     <div>
                         <div className="tasks-toolbar">
@@ -214,7 +214,7 @@ export default function OrganisationDetailPage() {
                                 + New Task
                             </button>
                         </div>
- 
+
                         {isLoadingTasks ? (
                             <div className="loading">Loading tasks...</div>
                         ) : tasks.length === 0 ? (

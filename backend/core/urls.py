@@ -17,11 +17,10 @@ from drf_spectacular.views import (
 urlpatterns = [
     path("admin/", admin.site.urls),
     # API
-    path('api/auth/', include('apps.authentication.urls')),
-    path('api/tasks/', include('apps.tasks.urls')),
-    path('api/organisations/', include('apps.organisations.urls')),
-    path('api/invitations/', include(invitation_patterns)),
-
+    path("api/auth/", include("apps.authentication.urls")),
+    path("api/tasks/", include("apps.tasks.urls")),
+    path("api/organisations/", include("apps.organisations.urls")),
+    path("api/invitations/", include(invitation_patterns)),
     # OpenApi Schema
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     # Swagger UI

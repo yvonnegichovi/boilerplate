@@ -9,6 +9,7 @@ OrgMiddleware) or flat (/api/tasks/, request.org is None):
   of that organisation.
 - Personal: task belongs only to `request.user` (organisation is null).
 """
+
 from django.db.models import Count
 from django.utils import timezone
 from rest_framework import generics, filters, permissions, status
@@ -52,14 +53,14 @@ class TaskListCreateView(generics.ListCreateAPIView):
     ordering = ["-created_at"]
 
     def get_permissions(self):
-        if getattr(self.request, 'org', None):
+        if getattr(self.request, "org", None):
             return [permissions.IsAuthenticated(), IsOrgMember()]
         return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
             return Task.objects.none()
-        org = getattr(self.request, 'org', None)
+        org = getattr(self.request, "org", None)
         if org:
             return Task.objects.filter(organisation=org)
         return Task.objects.filter(owner=self.request.user, organisation__isnull=True)
@@ -70,14 +71,18 @@ class TaskListCreateView(generics.ListCreateAPIView):
         return TaskSerializer
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user, organisation=getattr(self.request, 'org', None))
+        serializer.save(
+            owner=self.request.user, organisation=getattr(self.request, "org", None)
+        )
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(
-            TaskSerializer(serializer.instance, context=self.get_serializer_context()).data,
+            TaskSerializer(
+                serializer.instance, context=self.get_serializer_context()
+            ).data,
             status=status.HTTP_201_CREATED,
         )
 
@@ -108,14 +113,14 @@ class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
     http_method_names = ["get", "patch", "delete", "head", "options"]
 
     def get_permissions(self):
-        if getattr(self.request, 'org', None):
+        if getattr(self.request, "org", None):
             return [permissions.IsAuthenticated(), IsOrgMember()]
         return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
             return Task.objects.none()
-        org = getattr(self.request, 'org', None)
+        org = getattr(self.request, "org", None)
         if org:
             return Task.objects.filter(organisation=org)
         return Task.objects.filter(owner=self.request.user, organisation__isnull=True)
@@ -129,22 +134,26 @@ class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
         serializer.save()
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        return Response(TaskSerializer(serializer.instance, context=self.get_serializer_context()).data)
+        return Response(
+            TaskSerializer(
+                serializer.instance, context=self.get_serializer_context()
+            ).data
+        )
 
 
 @extend_schema(
     tags=TASKS_TAG,
-    summary='Task stats',
+    summary="Task stats",
     description=(
-        'Returns aggregate counts for the current task scope: total tasks, '
-        'a breakdown by status and by priority, and the number of overdue '
-        'tasks (past due date and not done). Scoped to the organisation when '
-        'called via /organisations/{slug}/tasks/stats/, otherwise scoped to '
+        "Returns aggregate counts for the current task scope: total tasks, "
+        "a breakdown by status and by priority, and the number of overdue "
+        "tasks (past due date and not done). Scoped to the organisation when "
+        "called via /organisations/{slug}/tasks/stats/, otherwise scoped to "
         "the authenticated user's personal tasks."
     ),
 )
@@ -152,12 +161,12 @@ class TaskStatsView(APIView):
     """GET /tasks/stats/ (or /organisations/{slug}/tasks/stats/) - aggregate task counts."""
 
     def get_permissions(self):
-        if getattr(self.request, 'org', None):
+        if getattr(self.request, "org", None):
             return [permissions.IsAuthenticated(), IsOrgMember()]
         return [permissions.IsAuthenticated()]
 
     def get(self, request, *args, **kwargs):
-        org = getattr(request, 'org', None)
+        org = getattr(request, "org", None)
         if org:
             qs = Task.objects.filter(organisation=org)
         else:
@@ -165,18 +174,24 @@ class TaskStatsView(APIView):
 
         by_status = {choice: 0 for choice, _ in Task.Status.choices}
         by_priority = {choice: 0 for choice, _ in Task.Priority.choices}
-        for row in qs.values('status').annotate(count=Count('id')):
-            by_status[row['status']] = row['count']
-        for row in qs.values('priority').annotate(count=Count('id')):
-            by_priority[row['priority']] = row['count']
+        for row in qs.values("status").annotate(count=Count("id")):
+            by_status[row["status"]] = row["count"]
+        for row in qs.values("priority").annotate(count=Count("id")):
+            by_priority[row["priority"]] = row["count"]
 
-        overdue = qs.filter(
-            due_date__lt=timezone.now().date(),
-        ).exclude(status=Task.Status.DONE).count()
+        overdue = (
+            qs.filter(
+                due_date__lt=timezone.now().date(),
+            )
+            .exclude(status=Task.Status.DONE)
+            .count()
+        )
 
-        return Response({
-            'total': qs.count(),
-            'by_status': by_status,
-            'by_priority': by_priority,
-            'overdue': overdue,
-        })
+        return Response(
+            {
+                "total": qs.count(),
+                "by_status": by_status,
+                "by_priority": by_priority,
+                "overdue": overdue,
+            }
+        )

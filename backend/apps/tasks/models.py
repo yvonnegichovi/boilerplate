@@ -20,18 +20,18 @@ class Task(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     owner = models.ForeignKey(
-                settings.AUTH_USER_MODEL,
-                on_delete=models.CASCADE,
-                related_name='tasks',
-            )
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="tasks",
+    )
     organisation = models.ForeignKey(
-                'organisations.Organisation',
-                on_delete=models.CASCADE,
-                null=True,
-                blank=True,
-                related_name='tasks',
-                help_text='If set, this task belongs to an organisation. If null, it is a personal task.',
-            )
+        "organisations.Organisation",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="tasks",
+        help_text="If set, this task belongs to an organisation. If null, it is a personal task.",
+    )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     status = models.CharField(

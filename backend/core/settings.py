@@ -25,26 +25,26 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "drf_spectacular",
     "drf_spectacular_sidecar",
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
-    'corsheaders',
-    'apps.authentication',
-    'apps.tasks',
-    'apps.organisations',
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "corsheaders",
+    "apps.authentication",
+    "apps.tasks",
+    "apps.organisations",
 ]
 
 AUTH_USER_MODEL = "authentication.User"
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'apps.organisations.middleware.OrgMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.organisations.middleware.OrgMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -119,20 +119,19 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Boilerplate API',
-    'DESCRIPTION': (
-        'Full-stack boilerplate demonstrating Django REST Framework, '
-        'SimpleJWT authentication, multi-tenant SaaS architecture, '
-        'PostgreSQL, and React + Vite frontend.'
-    ), 
-    'VERSION': '1.0.0',
-
-    'SERVE_INCLUDE_SCHEMA': False,
-    'SWAGGER_UI_DIST': 'SIDECAR',
-    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
-    'REDOC_DIST': 'SIDECAR',
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SECURITY': [{'jwtAuth': []}],
+    "TITLE": "Boilerplate API",
+    "DESCRIPTION": (
+        "Full-stack boilerplate demonstrating Django REST Framework, "
+        "SimpleJWT authentication, multi-tenant SaaS architecture, "
+        "PostgreSQL, and React + Vite frontend."
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SECURITY": [{"jwtAuth": []}],
 }
 
 SIMPLE_JWT = {
