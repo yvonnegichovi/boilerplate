@@ -63,7 +63,7 @@ class Membership(models.Model):
         on_delete=models.CASCADE,
         related_name='memberships'
     )
-    role = models.CharField(max_length=10, choices=Role.choices, default='Role.MEMBER')
+    role = models.CharField(max_length=10, choices=Role.choices, default=Role.MEMBER)
     joined_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -120,8 +120,8 @@ class Invitation(models.Model):
     )
     email = models.EmailField()
     token = models.CharField(max_length=64, default=_invitation_token, unique=True)
-    role = models.CharField(max_length=10, choices=Membership.Role.choices, default='Role.MEMBER')
-    status = models.CharField(max_length=10, choices=Status.choices, default='Status.PENDING')
+    role = models.CharField(max_length=10, choices=Membership.Role.choices, default=Membership.Role.MEMBER)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
     expires_at = models.DateTimeField(default=_invitation_expiry)
     created_at = models.DateTimeField(auto_now_add=True)
 

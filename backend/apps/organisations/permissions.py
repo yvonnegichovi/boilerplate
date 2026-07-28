@@ -41,7 +41,7 @@ class IsOrgAdmin(BasePermission):
     message = "You are not an admin of this organisation."
     def has_permission(self, request, view):
         membership = _get_membership(request)
-        return membership is not None and membership.is_admin
+        return membership is not None and (membership.is_admin or membership.is_owner)
 
 
 class IsOrgOwner(BasePermission):

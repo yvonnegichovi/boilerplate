@@ -42,6 +42,8 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 User = get_user_model()
 
+logger = logging.getLogger(__name__)
+
 
 @extend_schema_view(list=org_list_docs, create=org_create_docs)
 class OrganisationalListCreateView(generics.ListCreateAPIView):
@@ -64,7 +66,7 @@ class OrganisationalListCreateView(generics.ListCreateAPIView):
         Membership.objects.create(
             user=request.user,
             organisation=org,
-            role=Membership.Role.ADMIN,
+            role=Membership.Role.OWNER,
         )
         return Response(
             OrganisationSerializer(org, context={'request': request}).data,
@@ -142,11 +144,13 @@ class MemberDetailView(generics.RetrieveUpdateDestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         membership = self.get_object()
         if membership.user == request.user:
+            logger.warning("Tried removing themselves.")
             return Response(
                 {"detail": "You cannot remove yourself from the organisation."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if membership.role == Membership.Role.OWNER:
+            logger.warning("Cannot remove the owner of the organisation.")
             return Response(
                 {"detail": "You cannot remove the owner of the organisation."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -179,6 +183,7 @@ class InvitationListCreateView(generics.ListCreateAPIView):
         invitation = serializer.save(
             organisation=self.request.org, invited_by=self.request.user
         )
+        logger.info("Invitation created successfully.")
         return Response(
             InvitationSerializer(invitation).data,
             status=status.HTTP_201_CREATED,

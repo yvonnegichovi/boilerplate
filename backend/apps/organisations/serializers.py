@@ -143,7 +143,7 @@ class CreateInvitationSerializer(serializers.ModelSerializer):
         """
         org = self.context['request'].org
         if Membership.objects.filter(
-            user__email__isexact=value,
+            user__email__iexact=value,
             organisation=org,
         ).exists():
             logger.debug(f"Attempted to invite existing member with email '{value}' to organisation {org.id}.")
