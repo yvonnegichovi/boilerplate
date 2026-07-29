@@ -27,7 +27,8 @@ class OrgMiddlewareTests(TestCase):
 
     def test_sets_none_for_bare_organisations_list_path(self):
         request = RequestFactory().get("/api/orgaisations/")
-        self.assertIsNone(request.org)
+        result = self.middleware(request)
+        self.assertIsNone(result.org)
 
     def test_raises_404_for_unknown_slug(self):
         from django.http import Http404
