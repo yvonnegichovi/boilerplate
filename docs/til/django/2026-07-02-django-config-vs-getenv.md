@@ -10,7 +10,7 @@ tags:
 # TIL: Enforcing Config Layer over os.getenv in settings.py
 
 ### Problem / Scenario
-Raw `os.getenv` can be used in the `settings.py` however, it leads to highly brittle, repetitive manual validation blocks to convert those strings into necessary Python lists, integers, or booleans. 
+Raw `os.getenv` can be used in the `settings.py` however, it leads to highly brittle, repetitive manual validation blocks to convert those strings into necessary Python lists, integers, or booleans.
 
 ### Solution / Insight
 Abstract environment interaction into a dedicated config library (like `django-environ`) at the very top of `settings.py`. This acts as a protective parsing gateway.

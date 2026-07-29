@@ -7,7 +7,7 @@ describe('RoleBadge', () => {
     render(<RoleBadge role="owner" />)
     expect(screen.getByText('Owner')).toBeInTheDocument()
   })
- 
+
   it.each([
     ['admin', 'Admin'],
     ['member', 'Member'],
@@ -15,12 +15,12 @@ describe('RoleBadge', () => {
     render(<RoleBadge role={role} />)
     expect(screen.getByText(label)).toBeInTheDocument()
   })
- 
+
   it('renders nothing for a falsy role', () => {
     const { container } = render(<RoleBadge role={null} />)
     expect(container).toBeEmptyDOMElement()
   })
- 
+
   it('falls back to the raw value for an unknown role', () => {
     render(<RoleBadge role="superadmin" />)
     expect(screen.getByText('superadmin')).toBeInTheDocument()

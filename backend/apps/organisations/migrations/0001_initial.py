@@ -8,7 +8,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -17,59 +16,175 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Organisation',
+            name="Organisation",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=255)),
-                ('slug', models.SlugField(max_length=100, unique=True)),
-                ('logo', models.ImageField(blank=True, null=True, upload_to='org_logos/')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('created_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='created_organisations', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("slug", models.SlugField(max_length=100, unique=True)),
+                (
+                    "logo",
+                    models.ImageField(blank=True, null=True, upload_to="org_logos/"),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="created_organisations",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'db_table': 'organisations',
-                'ordering': ['name'],
+                "db_table": "organisations",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='Membership',
+            name="Membership",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('role', models.CharField(choices=[('member', 'Member'), ('admin', 'Admin'), ('owner', 'Owner')], default='Role.MEMBER', max_length=10)),
-                ('joined_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='memberships', to=settings.AUTH_USER_MODEL)),
-                ('organisation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='memberships', to='organisations.organisation')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[
+                            ("member", "Member"),
+                            ("admin", "Admin"),
+                            ("owner", "Owner"),
+                        ],
+                        default="Role.MEMBER",
+                        max_length=10,
+                    ),
+                ),
+                ("joined_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="memberships",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "organisation",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="memberships",
+                        to="organisations.organisation",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'memberships',
-                'ordering': ['joined_at'],
+                "db_table": "memberships",
+                "ordering": ["joined_at"],
             },
         ),
         migrations.CreateModel(
-            name='Invitation',
+            name="Invitation",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('email', models.EmailField(max_length=254)),
-                ('token', models.CharField(default=apps.organisations.models._invitation_token, max_length=64, unique=True)),
-                ('role', models.CharField(choices=[('member', 'Member'), ('admin', 'Admin'), ('owner', 'Owner')], default='Role.MEMBER', max_length=10)),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('expired', 'Expired'), ('revoked', 'Revoked')], default='Status.PENDING', max_length=10)),
-                ('expires_at', models.DateTimeField(default=apps.organisations.models._invitation_expiry)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('invited_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='sent_invitations', to=settings.AUTH_USER_MODEL)),
-                ('organisation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='invitations', to='organisations.organisation')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("email", models.EmailField(max_length=254)),
+                (
+                    "token",
+                    models.CharField(
+                        default=apps.organisations.models._invitation_token,
+                        max_length=64,
+                        unique=True,
+                    ),
+                ),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[
+                            ("member", "Member"),
+                            ("admin", "Admin"),
+                            ("owner", "Owner"),
+                        ],
+                        default="Role.MEMBER",
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("accepted", "Accepted"),
+                            ("expired", "Expired"),
+                            ("revoked", "Revoked"),
+                        ],
+                        default="Status.PENDING",
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "expires_at",
+                    models.DateTimeField(
+                        default=apps.organisations.models._invitation_expiry
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "invited_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="sent_invitations",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "organisation",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="invitations",
+                        to="organisations.organisation",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'invitations',
-                'ordering': ['created_at'],
+                "db_table": "invitations",
+                "ordering": ["created_at"],
             },
         ),
         migrations.AddConstraint(
-            model_name='membership',
-            constraint=models.UniqueConstraint(fields=('user', 'organisation'), name='unique_user_organisation_membership'),
+            model_name="membership",
+            constraint=models.UniqueConstraint(
+                fields=("user", "organisation"),
+                name="unique_user_organisation_membership",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='invitation',
-            constraint=models.UniqueConstraint(fields=('organisation', 'email'), name='unique_organisation_email_invitation'),
+            model_name="invitation",
+            constraint=models.UniqueConstraint(
+                fields=("organisation", "email"),
+                name="unique_organisation_email_invitation",
+            ),
         ),
     ]

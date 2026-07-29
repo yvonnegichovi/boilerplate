@@ -5,16 +5,22 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('organisations', '0001_initial'),
-        ('tasks', '0001_initial'),
+        ("organisations", "0001_initial"),
+        ("tasks", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='task',
-            name='organisation',
-            field=models.ForeignKey(blank=True, help_text='If set, this task belongs to an organisation. If null, it is a personal task.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='tasks', to='organisations.organisation'),
+            model_name="task",
+            name="organisation",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="If set, this task belongs to an organisation. If null, it is a personal task.",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="tasks",
+                to="organisations.organisation",
+            ),
         ),
     ]

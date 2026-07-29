@@ -1,0 +1,23 @@
+name: Validate PR to dev
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  validate-source-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate source branch
+        run: |
+          BRANCH="${{ github.head_ref }}"
+
+          if [[ "$BRANCH" =~ ^(feat|bugfix|hotfix|release|docs|refactor|test|chore)/.+$ ]]; then
+            echo "Valid branch: $BRANCH"
+            exit 0
+          fi
+
+          echo "Only feature branches may be merged into dev."
+          exit 1
