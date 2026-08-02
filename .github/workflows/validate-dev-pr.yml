@@ -14,7 +14,7 @@ jobs:
         run: |
           BRANCH="${{ github.head_ref }}"
 
-          if [[ "$BRANCH" =~ ^(feat|bugfix|hotfix|release|docs|refactor|test|chore|dependabot)/.+$ ]]; then
+          if [[ "$BRANCH" =~ ^(feat|bugfix|hotfix|release|docs|refactor|test|chore|dependabot|main)/.+$ ]]; then
             echo "Valid branch: $BRANCH"
             exit 0
           fi
