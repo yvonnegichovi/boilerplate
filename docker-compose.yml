@@ -1,0 +1,60 @@
+services:
+
+  db:
+    image: postgres:16
+
+    container_name: boilerplate-db
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: boilerplate
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+
+    container_name: boilerplate-backend
+
+    command: python manage.py runserver 0.0.0.0:8000
+
+    volumes:
+      - ./backend:/app
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - .env
+
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+
+    container_name: boilerplate-frontend
+
+    command: npm run dev -- --host
+
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+    ports:
+      - "5173:5173"
+
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

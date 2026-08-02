@@ -1,9 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Boilerplate Repository
+  title: Boilerplate API
   version: 1.0.0
-  description: Full-stack boilerplate demonstrating Django REST Framework, SimpleJWT
-    authentication, PostgreSQL, and React + Vite frontend.
+  description: API documentation for Boilerplate
 paths:
   /api/auth/change-password/:
     put:
@@ -15,20 +14,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChangePasswordRequest'
+              $ref: '#/components/schemas/ChangePassword'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ChangePasswordRequest'
+              $ref: '#/components/schemas/ChangePassword'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ChangePasswordRequest'
+              $ref: '#/components/schemas/ChangePassword'
         required: true
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePassword'
+          description: ''
     patch:
       operationId: auth_change_password_partial_update
       description: PUT /api/auth/change-password/ - change authenticated user's password.
@@ -38,19 +40,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedChangePasswordRequest'
+              $ref: '#/components/schemas/PatchedChangePassword'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedChangePasswordRequest'
+              $ref: '#/components/schemas/PatchedChangePassword'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedChangePasswordRequest'
+              $ref: '#/components/schemas/PatchedChangePassword'
       security:
-      - jwtAuth: []
       - jwtAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePassword'
+          description: ''
   /api/auth/login/:
     post:
       operationId: auth_login_create
@@ -64,7 +69,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenObtainPairRequest'
+              $ref: '#/components/schemas/TokenObtainPair'
             examples:
               LoginPayload:
                 value:
@@ -73,13 +78,12 @@ paths:
                 summary: Login payload
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenObtainPairRequest'
+              $ref: '#/components/schemas/TokenObtainPair'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/TokenObtainPairRequest'
+              $ref: '#/components/schemas/TokenObtainPair'
         required: true
       security:
-      - jwtAuth: []
       - {}
       responses:
         '200':
@@ -98,7 +102,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LogoutRequest'
+              $ref: '#/components/schemas/Logout'
             examples:
               LogoutPayload:
                 value:
@@ -106,13 +110,12 @@ paths:
                 summary: Logout payload
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/LogoutRequest'
+              $ref: '#/components/schemas/Logout'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/LogoutRequest'
+              $ref: '#/components/schemas/Logout'
         required: true
       security:
-      - jwtAuth: []
       - jwtAuth: []
       responses:
         '200':
@@ -127,7 +130,6 @@ paths:
       tags:
       - auth
       security:
-      - jwtAuth: []
       - jwtAuth: []
       responses:
         '200':
@@ -146,15 +148,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateProfileRequest'
+              $ref: '#/components/schemas/UpdateProfile'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UpdateProfileRequest'
+              $ref: '#/components/schemas/UpdateProfile'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UpdateProfileRequest'
+              $ref: '#/components/schemas/UpdateProfile'
       security:
-      - jwtAuth: []
       - jwtAuth: []
       responses:
         '200':
@@ -173,15 +174,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateProfileRequest'
+              $ref: '#/components/schemas/PatchedUpdateProfile'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateProfileRequest'
+              $ref: '#/components/schemas/PatchedUpdateProfile'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateProfileRequest'
+              $ref: '#/components/schemas/PatchedUpdateProfile'
       security:
-      - jwtAuth: []
       - jwtAuth: []
       responses:
         '200':
@@ -203,7 +203,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegisterRequest'
+              $ref: '#/components/schemas/Register'
             examples:
               RegistrationPayload:
                 value:
@@ -216,13 +216,12 @@ paths:
                 summary: Registration payload
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/RegisterRequest'
+              $ref: '#/components/schemas/Register'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/RegisterRequest'
+              $ref: '#/components/schemas/Register'
         required: true
       security:
-      - jwtAuth: []
       - jwtAuth: []
       - {}
       responses:
@@ -263,16 +262,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenRefreshRequest'
+              $ref: '#/components/schemas/TokenRefresh'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenRefreshRequest'
+              $ref: '#/components/schemas/TokenRefresh'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/TokenRefreshRequest'
+              $ref: '#/components/schemas/TokenRefresh'
         required: true
-      security:
-      - jwtAuth: []
       responses:
         '200':
           content:
@@ -280,43 +277,366 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenRefresh'
           description: ''
+  /api/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/tasks/:
+    get:
+      operationId: tasks_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: priority
+        schema:
+          type: string
+          enum:
+          - high
+          - low
+          - medium
+        description: |-
+          * `low` - Low
+          * `medium` - Medium
+          * `high` - High
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - done
+          - in_progress
+          - todo
+        description: |-
+          * `todo` - To Do
+          * `in_progress` - In Progress
+          * `done` - Done
+      tags:
+      - tasks
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaskList'
+          description: ''
+    post:
+      operationId: tasks_create
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TaskWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TaskWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskWrite'
+          description: ''
+  /api/tasks/{id}/:
+    get:
+      operationId: tasks_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tasks
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+    patch:
+      operationId: tasks_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTaskWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTaskWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTaskWrite'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskWrite'
+          description: ''
+    delete:
+      operationId: tasks_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tasks
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
 components:
   schemas:
-    ChangePasswordRequest:
+    ChangePassword:
       type: object
       properties:
         old_password:
           type: string
           writeOnly: true
-          minLength: 1
         new_password:
           type: string
           writeOnly: true
-          minLength: 1
       required:
       - new_password
       - old_password
-    LogoutRequest:
+    Logout:
       type: object
       properties:
         refresh:
           type: string
-          minLength: 1
           description: The refresh token to blacklist.
       required:
       - refresh
-    PatchedChangePasswordRequest:
+    PaginatedTaskList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+    PatchedChangePassword:
       type: object
       properties:
         old_password:
           type: string
           writeOnly: true
-          minLength: 1
         new_password:
           type: string
           writeOnly: true
-          minLength: 1
-    PatchedUpdateProfileRequest:
+    PatchedTaskWrite:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        due_date:
+          type: string
+          format: date
+          nullable: true
+    PatchedUpdateProfile:
       type: object
       properties:
         first_name:
@@ -327,15 +647,24 @@ components:
           maxLength: 150
         avatar:
           type: string
-          format: binary
+          format: uri
           nullable: true
-    RegisterRequest:
+    PriorityEnum:
+      enum:
+      - low
+      - medium
+      - high
+      type: string
+      description: |-
+        * `low` - Low
+        * `medium` - Medium
+        * `high` - High
+    Register:
       type: object
       properties:
         email:
           type: string
           format: email
-          minLength: 1
           maxLength: 254
         first_name:
           type: string
@@ -350,29 +679,98 @@ components:
         password:
           type: string
           writeOnly: true
-          minLength: 1
         password_confirm:
           type: string
           writeOnly: true
-          minLength: 1
       required:
       - email
       - password
       - password_confirm
-    TokenObtainPairRequest:
+    StatusEnum:
+      enum:
+      - todo
+      - in_progress
+      - done
+      type: string
+      description: |-
+        * `todo` - To Do
+        * `in_progress` - In Progress
+        * `done` - Done
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        owner:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        due_date:
+          type: string
+          format: date
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - owner
+      - title
+      - updated_at
+    TaskWrite:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        due_date:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - title
+    TokenObtainPair:
       type: object
       properties:
         email:
           type: string
           writeOnly: true
-          minLength: 1
         password:
           type: string
           writeOnly: true
-          minLength: 1
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
       required:
+      - access
       - email
       - password
+      - refresh
     TokenRefresh:
       type: object
       properties:
@@ -383,14 +781,6 @@ components:
           type: string
       required:
       - access
-      - refresh
-    TokenRefreshRequest:
-      type: object
-      properties:
-        refresh:
-          type: string
-          minLength: 1
-      required:
       - refresh
     UpdateProfile:
       type: object
@@ -404,19 +794,6 @@ components:
         avatar:
           type: string
           format: uri
-          nullable: true
-    UpdateProfileRequest:
-      type: object
-      properties:
-        first_name:
-          type: string
-          maxLength: 150
-        last_name:
-          type: string
-          maxLength: 150
-        avatar:
-          type: string
-          format: binary
           nullable: true
     User:
       type: object
