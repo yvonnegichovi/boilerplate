@@ -13,7 +13,7 @@ tags:
 Setting a variable locally via `DB_PORT=5432` allowed `echo $DB_PORT` to print the value, but running Python's `os.getenv("DB_PORT")` returned `None`. Additionally, variables vanished entirely upon closing the terminal session.
 
 ### Solution / Insight
-The terminal splits variable scopes into local shell variables and inherited environment processes. 
+The terminal splits variable scopes into local shell variables and inherited environment processes.
 
 * **`export`**: Modifies the environment block. It escalates a local variable to an environment variable, broadcasting it to all child processes (like Python interpreters) launched from that shell instance.
 * **`echo`**: A downstream readout utility. It evaluates strings or variable references (prefixed with `$`) and outputs them to standard stdout. It has no mechanism to write, bind, or modify configuration states.

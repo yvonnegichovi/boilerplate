@@ -21,4 +21,3 @@ jobs:
 
           echo "Only feature branches may be merged into dev."
           exit 1
-          

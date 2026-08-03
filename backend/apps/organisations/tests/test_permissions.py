@@ -1,25 +1,30 @@
-from django.test import TestCase, RequestFactory
-
 from apps.authentication.tests.factories import make_user
+from django.test import RequestFactory, TestCase
+
 from ..models import Membership
 from ..permissions import IsOrgAdmin, IsOrgMember, IsOrgOwner
-from .factories import make_organisation, make_membership
+from .factories import make_membership, make_organisation
 
 
 class OrgPermissionTests(TestCase):
-
     def setUp(self):
         self.org = make_organisation(created_by=make_user())
-        self.owner = make_user(email='owner@example.com')
-        self.admin = make_user(email='admin@example.com')
-        self.member = make_user(email='member@example.com')
-        self.outsider = make_user(email='outsider@example.com')
-        make_membership(user=self.owner, organisation=self.org, role=Membership.Role.OWNER)
-        make_membership(user=self.admin, organisation=self.org, role=Membership.Role.ADMIN)
-        make_membership(user=self.member, organisation=self.org, role=Membership.Role.MEMBER)
+        self.owner = make_user(email="owner@example.com")
+        self.admin = make_user(email="admin@example.com")
+        self.member = make_user(email="member@example.com")
+        self.outsider = make_user(email="outsider@example.com")
+        make_membership(
+            user=self.owner, organisation=self.org, role=Membership.Role.OWNER
+        )
+        make_membership(
+            user=self.admin, organisation=self.org, role=Membership.Role.ADMIN
+        )
+        make_membership(
+            user=self.member, organisation=self.org, role=Membership.Role.MEMBER
+        )
 
     def _request(self, user, org=True):
-        request = RequestFactory().get('/')
+        request = RequestFactory().get("/")
         request.user = user
         request.org = self.org if org else None
         return request
@@ -46,5 +51,6 @@ class OrgPermissionTests(TestCase):
 
     def test_all_permissions_deny_without_org(self):
         for perm_cls in (IsOrgOwner, IsOrgAdmin, IsOrgMember):
-            self.assertFalse(perm_cls().has_permission(self._request(self.owner, org=False), None))
-    
+            self.assertFalse(
+                perm_cls().has_permission(self._request(self.owner, org=False), None)
+            )
