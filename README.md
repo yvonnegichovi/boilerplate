@@ -2,490 +2,355 @@
 
 A modern full-stack boilerplate built with **Django** and **React (Vite)**, providing a solid foundation for building scalable web applications.
 
-## Tech Stack
-
-### Backend
-- Django 5
-- Django REST Framework
-- SimpleJWT Authentication
-- PostgreSQL
-
-### Frontend
-- React 18
-- Vite
-- React Router v6
-- Zustand
-- Axios
-- Tailwind CSS
+![Django](https://img.shields.io/badge/Django-5.0-092E20?style=flat&logo=django&logoColor=white)
+![DRF](https://img.shields.io/badge/Django_REST_Framework-3.15-red?style=flat)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat&logo=vite&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat&logo=postgresql&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-SimpleJWT-black?style=flat&logo=jsonwebtokens)
 
 ---
 
-# Project Structure
+## Tech Stack
+
+### Backend
+- **Django 5** — web framework
+- **Django REST Framework** — REST API layer
+- **SimpleJWT** — JWT authentication with token rotation and blacklisting
+- **drf-spectacular** — OpenAPI 3 schema + Swagger UI
+- **PostgreSQL** — relational database
+- **python-decouple** — environment variable management
+
+### Frontend
+- **React 18** — UI library
+- **Vite** — build tool and dev server
+- **React Router v6** — client-side routing
+- **Zustand** — auth state management
+- **Axios** — HTTP client with JWT interceptors
+- **Tailwind CSS v4** — utility-first styling
+- **React Hook Form** — form handling and validation
+
+---
+
+## Features
+
+### Implemented
+- [x] Custom User model (UUID PK, email-based auth, phone number, avatar)
+- [x] JWT authentication — register, login, logout, token refresh
+- [x] Silent token refresh via Axios interceptor (with request queue)
+- [x] Protected routes with automatic redirect
+- [x] Profile management — view and update
+- [x] Password change with old password verification
+- [x] Swagger UI at `/api/docs/` and ReDoc at `/api/redoc/`
+- [x] Modular `apps/` architecture — each feature is a self-contained Django app
+- [x] `docs.py` convention — OpenAPI decorators separated from business logic
+- [x] Full backend test suite — models, serializers, and API endpoints
+- [x] CI/CD pipeline with GitHub Actions (dev and production workflows)
+
+### Coming Soon
+- [ ] Tasks module — CRUD with status, priority, and due dates
+- [ ] Blog module — posts, categories, and tags
+- [ ] File uploads
+- [ ] Docker + docker-compose
+- [ ] Frontend tests (Vitest + React Testing Library)
+
+---
+
+## Project Structure
 
 ```text
 .
 ├── backend/
-│   ├── core/
+│   ├── core/                   # Django project config (settings, urls, wsgi)
 │   ├── apps/
-│   │   └── authentication/
+│   │   └── authentication/     # Auth module
+│   │       ├── models.py
+│   │       ├── serializers.py
+│   │       ├── views.py
+│   │       ├── docs.py         # OpenAPI decorators
+│   │       ├── urls.py
+│   │       ├── admin.py
+│   │       └── tests/
 │   ├── manage.py
-│   └── requirements.txt
+│   ├── requirements.txt
+│   └── .env.example
 │
 ├── frontend/
 │   ├── src/
-│   ├── public/
-│   └── package.json
+│   │   ├── api/                # Axios client and API functions
+│   │   ├── components/         # Reusable components
+│   │   ├── context/            # Zustand stores
+│   │   ├── pages/              # Page components
+│   │   └── styles/             # CSS and Tailwind
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
 │
 └── README.md
 ```
 
 ---
 
-# Getting Started
+## Getting Started
 
-## 1. Fork the Repository
+### Prerequisites
 
-Fork this repository into your GitHub account.
+- Python 3.11+
+- Node.js 22+
+- PostgreSQL 15+
+- Git
 
 ---
 
-## 2. Clone the Repository
+## Backend Setup
+
+### 1. Fork and Clone
 
 ```bash
 git clone https://github.com/<your-username>/<repository>.git
-
 cd <repository>
 ```
 
----
+### 2. Create and Activate a Virtual Environment
 
-# Backend Setup
-
-## 1. Create a Virtual Environment
-
-### Windows
-
+**macOS / Linux**
 ```bash
-python -m venv .venv
+python3 -m venv venv
+source venv/bin/activate
 ```
 
-### macOS / Linux
-
-```bash
-python3 -m venv .venv
-```
-
----
-
-## 2. Activate the Virtual Environment
-
-### Windows (Command Prompt)
-
+**Windows (Command Prompt)**
 ```cmd
-.venv\Scripts\activate.bat
+python -m venv venv
+venv\Scripts\activate.bat
 ```
 
-### Windows (PowerShell)
-
+**Windows (PowerShell)**
 ```powershell
-.venv\Scripts\Activate.ps1
+python -m venv venv
+venv\Scripts\Activate.ps1
 ```
 
-### macOS / Linux
+### 3. Install Dependencies
 
 ```bash
-source .venv/bin/activate
-```
-
----
-
-## 3. Install Dependencies
-
-```bash
+cd backend
 pip install -r requirements.txt
 ```
 
 ---
 
-# Environment Variables
+## Environment Variables
 
-Create a `.env` file in the backend root.
+Copy `.env.example` to `.env` and update the values:
 
-> **Do not create it manually.**
->
-> Copy the values from `.env.example` and replace the placeholder values with your local configuration.
-
-Example:
-
+**macOS / Linux**
 ```bash
 cp .env.example .env
 ```
 
-or on Windows
-
+**Windows**
 ```cmd
 copy .env.example .env
 ```
 
-Update the variables as needed.
-
-Example:
+`.env` reference:
 
 ```env
 SECRET_KEY=your-secret-key
-
 DEBUG=True
-
-DATABASE_URL=postgres://my_django_user:your_password@localhost:5432/my_local_db
-
 ALLOWED_HOSTS=localhost,127.0.0.1
-
+DATABASE_URL=postgres://my_django_user:your_password@localhost:5432/my_local_db
 CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
 ```
 
 ---
 
-# PostgreSQL Setup
+## PostgreSQL Setup
 
-## Create a PostgreSQL User
-
-### Linux (Ubuntu/Debian)
+### Create a User and Database
 
 ```bash
 psql -U postgres
 ```
 
-Create a user.
-
 ```sql
-CREATE USER my_django_user
-WITH PASSWORD 'your_password';
-```
-
-Grant database creation privileges.
-
-```sql
+CREATE USER my_django_user WITH PASSWORD 'your_password';
 ALTER USER my_django_user CREATEDB;
-```
 
-Exit PostgreSQL.
-
-```sql
-\q
-```
-
----
-
-### Windows
-
-Open Command Prompt or PowerShell.
-
-```bash
-psql -U postgres
-```
-
-Create the user.
-
-```sql
-CREATE USER my_django_user
-WITH PASSWORD 'your_password';
-```
-
-Grant permissions.
-
-```sql
-ALTER USER my_django_user CREATEDB;
-```
-
-Exit.
-
-```sql
-\q
-```
-
----
-
-# Create the Database
-
-Login as postgres.
-
-```bash
-psql -U postgres
-```
-
-Create the database.
-
-```sql
 CREATE DATABASE my_local_db;
-```
+GRANT ALL PRIVILEGES ON DATABASE my_local_db TO my_django_user;
 
-Grant privileges.
-
-```sql
-GRANT ALL PRIVILEGES
-ON DATABASE my_local_db
-TO my_django_user;
-```
-
-Connect to the database.
-
-```sql
 \c my_local_db
-```
-
-Grant schema permissions.
-
-```sql
 GRANT ALL ON SCHEMA public TO my_django_user;
-```
-
-Exit PostgreSQL.
-
-```sql
 \q
 ```
 
----
-
-# Verify the Database
-
-Login using your newly created user.
+### Verify the Connection
 
 ```bash
 psql -U my_django_user -d my_local_db -h localhost
 ```
 
-If you successfully connect, your PostgreSQL configuration is complete.
+A successful connection confirms your PostgreSQL setup is complete.
 
 ---
 
-# Database Migrations
-
-Run the initial migrations.
+## Database Migrations
 
 ```bash
 python manage.py migrate
-```
-
-Create an administrator account.
-
-```bash
 python manage.py createsuperuser
 ```
 
 ---
 
-# Running the Backend
-
-Start the Django development server.
+## Running the Backend
 
 ```bash
 python manage.py runserver
 ```
 
-Backend URL:
-
-```
-http://localhost:8000
-```
+| URL | Description |
+|-----|-------------|
+| `http://localhost:8000/admin/` | Django admin |
+| `http://localhost:8000/api/docs/` | Swagger UI |
+| `http://localhost:8000/api/redoc/` | ReDoc |
 
 ---
 
-# Frontend Setup
-
-Navigate to the frontend directory.
+## Frontend Setup
 
 ```bash
 cd frontend
-```
-
-Install dependencies.
-
-```bash
 npm install
+npm run dev
 ```
 
-### Install Tailwind CSS
+Frontend runs at `http://localhost:5173`.
 
-If Tailwind CSS has not already been installed, run the following commands from the `frontend` directory.
+### Tailwind CSS
+
+Tailwind v4 is configured via the `@tailwindcss/vite` plugin — no `tailwind.config.js` required. If setting up from scratch:
 
 ```bash
 npm install -D tailwindcss @tailwindcss/vite
 ```
 
-Update your `vite.config.js` (or `vite.config.ts`) to include the Tailwind Vite plugin.
+Add the plugin to `vite.config.js`:
 
-```javascript
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+```js
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-  ],
-});
+  plugins: [react(), tailwindcss()],
+})
 ```
 
-Import Tailwind into your main stylesheet (for example, `src/index.css` or `src/styles/main.css`).
+Add to your main CSS file:
 
 ```css
 @import "tailwindcss";
 ```
 
-Ensure your application's entry file imports the stylesheet.
+---
 
-```javascript
-import "./index.css";
-```
+## API Documentation
 
-You can verify the installation by adding a Tailwind utility class to a component.
+Interactive API documentation is available once the backend is running:
 
-```jsx
-function App() {
-  return (
-    <h1 className="text-3xl font-bold text-blue-600">
-      Tailwind CSS is working!
-    </h1>
-  );
-}
-```
+- **Swagger UI** — `http://localhost:8000/api/docs/`
+- **ReDoc** — `http://localhost:8000/api/redoc/`
+- **OpenAPI schema** — `http://localhost:8000/api/schema/`
 
-If the styled text appears correctly when running the application, Tailwind CSS has been configured successfully.
+### Authentication Endpoints
 
-Run the development server.
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/register/` | Public | Create account |
+| POST | `/api/auth/login/` | Public | Obtain tokens |
+| POST | `/api/auth/logout/` | Required | Blacklist refresh token |
+| POST | `/api/auth/token/refresh/` | Public | Rotate tokens |
+| GET | `/api/auth/me/` | Required | Get profile |
+| PATCH | `/api/auth/me/` | Required | Update profile |
+| PUT | `/api/auth/change-password/` | Required | Change password |
+
+---
+
+## Authentication Flow
+
+1. User registers → backend creates account and returns access token, refresh token, and user object
+2. Tokens stored in `localStorage` by the Zustand auth store
+3. Axios attaches `Authorization: Bearer <token>` to every request
+4. On 401, Axios silently calls `/api/auth/token/refresh/` and retries the original request
+5. Concurrent requests during refresh are queued — only one refresh fires at a time
+6. On logout, the refresh token is blacklisted server-side
+
+---
+
+## Running Tests
 
 ```bash
-npm run dev
+cd backend
+source venv/bin/activate
+python manage.py test apps.authentication.tests --verbosity=2
 ```
 
-Frontend URL:
-
-```
-http://localhost:5173
-```
+Tests cover:
+- **Models** — UUID PK, password hashing, email normalisation, `full_name`, optional fields
+- **Serializers** — validation, duplicate email, weak passwords, write-only password
+- **Views** — all 7 endpoints including token blacklisting, rotation, and edge cases
 
 ---
 
-# Authentication Flow
+## Local Development Workflow
 
-Authentication is handled using **JWT (JSON Web Tokens)** via **Django REST Framework SimpleJWT**.
-
-The authentication flow is as follows:
-
-1. A user registers through the frontend.
-2. The backend creates the account.
-3. The backend returns:
-   - Access Token
-   - Refresh Token
-   - User object
-4. Tokens are securely stored by the frontend.
-5. Axios automatically attaches the access token to authenticated requests.
-6. When the access token expires, Axios silently refreshes it using the refresh token.
-7. If the refresh token has expired or is invalid, the user is redirected to the login page.
+1. Pull latest changes: `git pull`
+2. Activate virtual environment
+3. Install new backend deps: `pip install -r requirements.txt`
+4. Apply migrations: `python manage.py migrate`
+5. Start backend: `python manage.py runserver`
+6. Install new frontend deps: `npm install`
+7. Start frontend: `npm run dev`
+8. Develop your feature
+9. Run tests: `python manage.py test`
+10. Commit, push, and open a Pull Request
 
 ---
 
-# Local Development Workflow
+## Troubleshooting
 
-Typical development workflow:
+**CORS errors**
+Ensure the frontend URL is in `CORS_ALLOWED_ORIGINS` in your `.env`.
 
-1. Pull the latest changes.
+**Database connection errors**
+- Confirm PostgreSQL is running
+- Verify `DATABASE_URL` credentials match your PostgreSQL user and database
+- Confirm the database exists and the user has the correct privileges
 
-```bash
-git pull
-```
+**Migration errors**
+- Confirm PostgreSQL is running
+- Confirm the database has been created
+- Confirm environment variables are loaded (`source venv/bin/activate` and `.env` is present)
 
-2. Activate the virtual environment.
-
-3. Install any new dependencies.
-
-```bash
-pip install -r requirements.txt
-```
-
-4. Apply database migrations.
-
-```bash
-python manage.py migrate
-```
-
-5. Start the backend.
-
-```bash
-python manage.py runserver
-```
-
-6. Start the frontend.
-
-```bash
-npm run dev
-```
-
-7. Develop your feature.
-
-8. Run tests before committing.
-
-9. Commit your changes.
-
-10. Push your branch and open a Pull Request.
+**`DATABASE_URL not found` error**
+You likely haven't created your `.env` file. Run `cp .env.example .env` and fill in your values.
 
 ---
 
-# Available Components
+## Contributing
 
-Current modules include:
-
-- Authentication
-
-Additional modules will be added as development progresses.
-
----
-
-# Troubleshooting
-
-## CORS Errors
-
-Ensure the frontend URL is included in:
-
-```env
-CORS_ALLOWED_ORIGINS
-```
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Make your changes
+4. Run tests: `python manage.py test`
+5. Commit: `git commit -m "feat: your feature description"`
+6. Push: `git push origin feature/your-feature`
+7. Open a Pull Request against `dev`
 
 ---
 
-## Database Connection Errors
+## License
 
-Verify:
-
-- PostgreSQL is running.
-- `DATABASE_URL` is correct.
-- The database exists.
-- The configured user has the necessary privileges.
-
----
-
-## Migration Errors
-
-If migrations fail, ensure:
-
-- PostgreSQL is running.
-- The database has been created.
-- Environment variables are correctly configured.
-
----
-
-# Contributing
-
-1. Fork the repository.
-2. Create a feature branch.
-3. Make your changes.
-4. Run tests.
-5. Submit a Pull Request.
-
----
-
-# License
-
-Specify the project's license here.
+boilerplate - Yvonne Gichovi Repository

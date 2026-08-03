@@ -48,9 +48,9 @@ Examples:
 - Configured Axios interceptors
 - Updated API routes
 
-- 
-- 
-- 
+-
+-
+-
 
 ---
 
