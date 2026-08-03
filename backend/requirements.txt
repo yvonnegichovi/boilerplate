@@ -9,4 +9,4 @@ dj-database-url==3.1.2
 drf-spectacular==0.30.0
 drf-spectacular-sidecar==2024.7.1
 django-filter==24.3
-pre-commit==4.1.0
+pre-commit==4.6.1
