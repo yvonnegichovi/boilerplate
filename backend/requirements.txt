@@ -1,5 +1,5 @@
-Django==6.0.7
-djangorestframework==3.17.1
+Django==6.1
+djangorestframework==3.18.0
 djangorestframework-simplejwt==5.5.1
 django-cors-headers==4.9.0
 python-decouple==3.8
@@ -7,6 +7,6 @@ Pillow==12.3.0
 psycopg2-binary==2.9.12
 dj-database-url==3.1.2
 drf-spectacular==0.30.0
-drf-spectacular-sidecar==2024.7.1
+drf-spectacular-sidecar==2026.8.1
 django-filter==24.3
-pre-commit==4.6.1
+pre-commit==4.6.2
