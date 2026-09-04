@@ -37,14 +37,7 @@ updates:
           - "@types/react"
           - "@types/react-dom"
           - "@testing-library/react"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
-    labels:
-      - "dependencies"
-      - "frontend"
 
-    groups:
       frontend-production-minor-patch:
         applies-to: version-updates
         dependency-type: "production"
@@ -57,6 +50,14 @@ updates:
         update-types:
           - "minor"
           - "patch"
+
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "frontend"
+
 
   # Backend Docker image
   - package-ecosystem: "docker"
