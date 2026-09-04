@@ -42,7 +42,7 @@ api.interceptors.response.use(
         try {
             const refresh = localStorage.getItem('refresh_token')
             const { data } = await axios.post('/api/auth/token/refresh/', { refresh })
-            eocalStorage.setItem('access_token', data.access)
+            localStorage.setItem('access_token', data.access)
             processQueue(null, data.access)
             original.headers.Authorization = `Bearer ${data.access}`
             return api(original)

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -10,18 +10,23 @@ import {
   X,
   Moon,
   Sun,
-  Home
+  Home,
+  LogOut,
 } from 'lucide-react';
 
 import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
 import OrganisationsPage from './pages/OrganisationsPage';
+import OrganisationDetailPage from './pages/OrganisationDetailPage';
 import TasksPage from './pages/TasksPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import InviteAcceptPage from './pages/InviteAcceptPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import useAuthStore from './context/authStore';
 
 const navItems = [
-  { to: '/', label: 'Overview', icon: Home },
+  { to: '/', label: 'Home', icon: Home },
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/organisations', label: 'Organizations', icon: Building2 },
   { to: '/tasks', label: 'Tasks', icon: CheckSquare },
@@ -42,23 +47,42 @@ function AnimatedRoutes() {
       >
         <Routes location={location}>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/organisations" element={<OrganisationsPage />} />
-          <Route path="/tasks" element={<TasksPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/invitations/accept/:token" element={<InviteAcceptPage />} />
+
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/organisations" element={<OrganisationsPage />} />
+            <Route path="/organisations/:slug" element={<OrganisationDetailPage />} />
+            <Route path="/tasks" element={<TasksPage />} />
+          </Route>
         </Routes>
       </motion.div>
     </AnimatePresence>
   );
 }
 
-export default function App() {
+function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     return savedTheme ? savedTheme === 'dark' : false;
   });
+
+  const navigate = useNavigate();
+  const { user, isAuthenticated, fetchMe, logout } = useAuthStore();
+
+  useEffect(() => {
+    if (isAuthenticated) fetchMe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    setSidebarOpen(false);
+    navigate('/login');
+  };
 
   useEffect(() => {
     if (isDarkMode) {
@@ -73,7 +97,6 @@ export default function App() {
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   return (
-    <Router>
       <div className="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
         {/* Mobile Sidebar Overlay */}
         <AnimatePresence>
@@ -104,6 +127,7 @@ export default function App() {
               </span>
             </Link>
             <button
+              type="button"
               onClick={() => setSidebarOpen(false)}
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
             >
@@ -126,8 +150,19 @@ export default function App() {
             ))}
           </nav>
 
-          <div className="p-4 border-t border-slate-200 dark:border-slate-800">
+          <div className="p-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center space-x-2 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 text-xs font-semibold transition hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <LogOut className="w-4 h-4 text-slate-500" />
+                <span>Sign out{user?.email ? ` (${user.email})` : ''}</span>
+              </button>
+            )}
             <button
+              type="button"
               onClick={toggleTheme}
               className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 text-xs font-semibold transition hover:bg-slate-100 dark:hover:bg-slate-800"
             >
@@ -144,6 +179,7 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
+                type="button"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
               >
@@ -176,6 +212,7 @@ export default function App() {
               <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-800 hidden md:block" />
 
               <button
+                type="button"
                 onClick={toggleTheme}
                 className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition hover:bg-slate-100"
                 aria-label="Toggle Theme"
@@ -183,12 +220,23 @@ export default function App() {
                 {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
               </button>
 
-              <Link
-                to="/login"
-                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition active:scale-95"
-              >
-                Sign In
-              </Link>
+              {isAuthenticated ? (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="hidden sm:inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition active:scale-95"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition active:scale-95"
+                >
+                  Sign In
+                </Link>
+              )}
             </div>
           </div>
         </header>
@@ -203,6 +251,13 @@ export default function App() {
         </footer>
 
       </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <AppShell />
     </Router>
   );
 }
