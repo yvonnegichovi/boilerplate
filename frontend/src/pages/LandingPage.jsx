@@ -106,7 +106,9 @@ export default function LandingPage() {
             <ArrowRight className="w-4 h-4" />
           </Link>
           <a
-            href="#codebase"
+            href="https://github.com/yvonnegichovi/boilerplate/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white border border-purple-200 hover:bg-purple-50 text-purple-950 font-semibold text-sm flex items-center justify-center space-x-2 transition"
           >
             <Code2 className="w-4 h-4 text-purple-600" />
