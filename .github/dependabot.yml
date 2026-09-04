@@ -15,6 +15,13 @@ updates:
       - "dependencies"
       - "backend"
 
+    groups:
+      backend-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+
   # Frontend (npm)
   - package-ecosystem: "npm"
     directory: "/frontend"
@@ -22,12 +29,35 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    groups:
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+          - "@testing-library/react"
+
+      frontend-production-minor-patch:
+        applies-to: version-updates
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      frontend-development-minor-patch:
+        applies-to: version-updates
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+
     commit-message:
       prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
       - "frontend"
+
 
   # Backend Docker image
   - package-ecosystem: "docker"
@@ -44,6 +74,13 @@ updates:
       - "docker"
       - "backend"
 
+    groups:
+      backend-docker-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+
   # Frontend Docker image
   - package-ecosystem: "docker"
     directory: "/frontend"
@@ -59,6 +96,13 @@ updates:
       - "docker"
       - "frontend"
 
+    groups:
+      frontend-docker-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+
   # GitHub Actions workflows
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -72,3 +116,9 @@ updates:
     labels:
       - "dependencies"
       - "ci"
+    groups:
+      github-actions-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
