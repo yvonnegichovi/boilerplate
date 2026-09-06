@@ -1,8 +1,8 @@
 const STATUS_STYLES = {
-    pending: 'badge badge-pending',
-    accepted: 'badge badge-done',
-    expired: 'badge badge-todo',
-    revoked: 'badge badge-high',
+    pending: 'bg-amber-100 text-amber-700 border-amber-200',
+    accepted: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    expired: 'bg-slate-100 text-slate-600 border-slate-200',
+    revoked: 'bg-red-100 text-red-700 border-red-200',
 }
 
 const STATUS_LABELS = {
@@ -14,7 +14,7 @@ const STATUS_LABELS = {
 
 export default function InviteStatusBadge({ status }) {
     return (
-        <span className={STATUS_STYLES[status] || 'badge'}>
+        <span className={`inline-flex items-center text-xs px-2.5 py-1 rounded-full font-medium border ${STATUS_STYLES[status] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
             {STATUS_LABELS[status] || status}
         </span>
     )

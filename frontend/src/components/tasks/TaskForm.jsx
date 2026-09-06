@@ -1,6 +1,8 @@
 import { useEffect } from "react"
 import { useForm } from 'react-hook-form'
 import useTaskStore from "../../context/Taskstore"
+import Modal from '../common/Modal'
+import { labelClass, inputClass, selectClass, cancelButtonClass, submitButtonClass, fieldErrorClass } from '../common/formStyles'
 
 export default function TaskForm({ task = null, onClose, slug }) {
     const { createTask, updateTask, isSubmitting } = useTaskStore()
@@ -31,66 +33,65 @@ export default function TaskForm({ task = null, onClose, slug }) {
     }
 
     return (
-        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="modal">
-                <div className="modal-header">
-                    <h2>{isEditing ? 'Edit Task' : 'New Task'}</h2>
-                    <button className="modal-close" onClick={onClose}>X</button>
+        <Modal title={isEditing ? 'Edit Task' : 'New Task'} onClose={onClose}>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+                <div>
+                    <label className={labelClass}>Title</label>
+                    <input
+                        {...register('title', { required: 'Title is required' })}
+                        placeholder="What needs to be done?"
+                        className={inputClass}
+                    />
+                    {errors.title && <p className={fieldErrorClass}>{errors.title.message}</p>}
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} noValidate>
-                    <div className="field">
-                        <label>Title</label>
-                        <input
-                            {...register('title', { required: 'Title is required' })}
-                            placeholder="What needs to be done?"
-                        />
-                        {errors.title && <span className="field-error">{errors.title.message}</span>}
-                    </div>
+                <div>
+                    <label className={labelClass}>
+                        Description <span className="normal-case font-normal text-slate-400">(optional)</span>
+                    </label>
+                    <textarea
+                        {...register('description')}
+                        rows={3}
+                        placeholder="Add details..."
+                        className={`${inputClass} resize-y`}
+                    />
+                </div>
 
-                    <div className="field">
-                        <label>Description <span className="field-optional">(optional)</span></label>
-                        <textarea
-                            {...register('description')}
-                            rows={3}
-                            placeholder="Add details..."
-                        />
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <label className={labelClass}>Status</label>
+                        <select {...register('status')} className={selectClass}>
+                            <option value='todo'>To Do</option>
+                            <option value='in_progress'>In Progress</option>
+                            <option value='done'>Done</option>
+                        </select>
                     </div>
+                    <div>
+                        <label className={labelClass}>Priority</label>
+                        <select {...register('priority')} className={selectClass}>
+                            <option value='low'>Low</option>
+                            <option value='medium'>Medium</option>
+                            <option value='high'>High</option>
+                        </select>
+                    </div>
+                </div>
 
-                    <div className="field-row">
-                        <div className="field">
-                            <label>Status</label>
-                            <select {...register('status')}>
-                                <option value='todo'>To Do</option>
-                                <option value='in_progress'>In Progress</option>
-                                <option value='done'>Done</option>
-                            </select>
-                        </div>
-                        <div className="field">
-                            <label>Priority</label>
-                            <select {...register('priority')}>
-                                <option value='low'>Low</option>
-                                <option value='medium'>Medium</option>
-                                <option value='high'>High</option>
-                            </select>
-                        </div>
-                    </div>
+                <div>
+                    <label className={labelClass}>
+                        Due Date <span className="normal-case font-normal text-slate-400">(optional)</span>
+                    </label>
+                    <input type="date" {...register('due_date')} className={inputClass} />
+                </div>
 
-                    <div className="field">
-                        <label>Due Date <span className="field-optional">(optional)</span></label>
-                        <input type="date" {...register('due_date')} />
-                    </div>
-
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-outline" onClick={onClose}>
-                            Cancel
-                        </button>
-                        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                            {isSubmitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Task'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <div className="flex justify-end gap-3 pt-2">
+                    <button type="button" className={cancelButtonClass} onClick={onClose}>
+                        Cancel
+                    </button>
+                    <button type="submit" className={submitButtonClass} disabled={isSubmitting}>
+                        {isSubmitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Task'}
+                    </button>
+                </div>
+            </form>
+        </Modal>
     )
 }
