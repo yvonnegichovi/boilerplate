@@ -18,6 +18,19 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:7-alpine
+
+    container_name: boilerplate-redis
+
+    restart: unless-stopped
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/data
+
   backend:
     build:
       context: ./backend
@@ -35,8 +48,79 @@ services:
     env_file:
       - .env
 
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      FLOWER_INTERNAL_URL: http://flower:5555
+
     depends_on:
       - db
+      - redis
+      - flower
+
+  celery-worker:
+    build:
+      context: ./backend
+
+    container_name: boilerplate-celery-worker
+
+    command: celery -A core worker -l info
+
+    volumes:
+      - ./backend:/app
+
+    env_file:
+      - .env
+
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+
+    depends_on:
+      - db
+      - redis
+
+  celery-beat:
+    build:
+      context: ./backend
+
+    container_name: boilerplate-celery-beat
+
+    command: celery -A core beat -l info
+
+    volumes:
+      - ./backend:/app
+
+    env_file:
+      - .env
+
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+
+    depends_on:
+      - db
+      - redis
+
+  flower:
+    build:
+      context: ./backend
+
+    container_name: boilerplate-flower
+
+    command: celery -A core flower --port=5555 --url_prefix=flower
+
+    env_file:
+      - .env
+
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      FLOWER_BASIC_AUTH: ${FLOWER_BASIC_AUTH:-}
+
+    depends_on:
+      - redis
+      - celery-worker
 
   frontend:
     build:
@@ -58,3 +142,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
