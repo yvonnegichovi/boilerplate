@@ -12,9 +12,12 @@ import {
   CheckCircle,
   ExternalLink,
   Building2,
-  Activity
+  Activity,
+  Flower2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+const FLOWER_URL = import.meta.env.VITE_FLOWER_URL || '/flower/';
 
 const backendSnippet = `class DynamicRateLimiter(BasePermission):
     """Distributed Redis sliding-window rate limiter for multi-tenant routes."""
@@ -205,6 +208,59 @@ export default function LandingPage() {
                 <span className="text-purple-400 animate-pulse">RUNNING</span>
               </div>
             </div>
+          )}
+        </div>
+
+        {/* CTA - the panel above is a static mock; these link to the real thing */}
+        <div className="mt-6 pt-6 border-t border-purple-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+          {previewTab === 'dashboard' ? (
+            <>
+              <p className="text-xs text-slate-500 text-center sm:text-left">
+                This preview is illustrative. Sign in to explore the real{' '}
+                <span className="font-semibold text-slate-700">Agency Dashboard</span>
+              </p>
+              <Link
+                to="/login"
+                className="w-full sm:w-auto flex-shrink-0 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center space-x-2 shadow-lg shadow-slate-900/20 transition-all duration-200 active:scale-95"
+              >
+                <span>Open Live Demo</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-slate-500 text-center sm:text-left">
+                This preview is illustrative. Real task/worker monitoring is live in the{' '}
+                <span className="font-semibold text-slate-700">Celery Dashboard</span>, alongside{' '}
+                <span className="font-semibold text-slate-700">Flower</span>, the standard Celery
+                admin tool.
+              </p>
+              <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-3 flex-shrink-0">
+                <Link
+                  to="/admin/login?next=/admin/celery"
+                  className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center space-x-2 shadow-lg shadow-slate-900/20 transition-all duration-200 active:scale-95"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Open Celery Dashboard</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                {/* Goes through the same admin login gate as the Celery
+                    Dashboard above - AdminLoginPage redirects on to Flower
+                    (a real browser navigation, since it's outside this
+                    SPA's routes) once signed in as staff. Opens in a new
+                    tab so the landing page itself is left in place. */}
+                <Link
+                  to={`/admin/login?next=${encodeURIComponent(FLOWER_URL)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-xl bg-white border border-purple-200 hover:bg-purple-50 text-purple-950 font-semibold text-xs flex items-center justify-center space-x-2 transition"
+                >
+                  <Flower2 className="w-3.5 h-3.5 text-purple-600" />
+                  <span>View on Flower</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-purple-600" />
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </section>

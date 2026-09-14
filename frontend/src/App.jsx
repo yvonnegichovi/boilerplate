@@ -12,6 +12,8 @@ import {
   Sun,
   Home,
   LogOut,
+  Activity,
+  SidebarOpen,
 } from 'lucide-react';
 
 import LandingPage from './pages/LandingPage';
@@ -22,6 +24,8 @@ import TasksPage from './pages/TasksPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import InviteAcceptPage from './pages/InviteAcceptPage';
+import AdminLoginPage from './pages/AdminLoginPage';
+import CeleryMonitorPage from './pages/CeleryMonitorPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import useAuthStore from './context/authStore';
 
@@ -30,6 +34,10 @@ const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/organisations', label: 'Organizations', icon: Building2 },
   { to: '/tasks', label: 'Tasks', icon: CheckSquare },
+];
+
+const staffNavItems = [
+  { to: '/admin/celery', label: 'Celery', icon: Activity },
 ];
 
 function AnimatedRoutes() {
@@ -43,12 +51,13 @@ function AnimatedRoutes() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -6 }}
         transition={{ duration: 0.2 }}
-        className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full"
+        className="flex-1 p-6 md:p-10 mx-auto w-full"
       >
         <Routes location={location}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/invitations/accept/:token" element={<InviteAcceptPage />} />
 
           <Route element={<ProtectedRoute />}>
@@ -56,6 +65,10 @@ function AnimatedRoutes() {
             <Route path="/organisations" element={<OrganisationsPage />} />
             <Route path="/organisations/:slug" element={<OrganisationDetailPage />} />
             <Route path="/tasks" element={<TasksPage />} />
+          </Route>
+
+          <Route element={<ProtectedRoute requireStaff />}>
+            <Route path="/admin/celery" element={<CeleryMonitorPage />} />
           </Route>
         </Routes>
       </motion.div>
@@ -78,11 +91,30 @@ function AppShell() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
+  useEffect(() => {
+    if (isAuthenticated) setSidebarOpen(true);
+  }, [isAuthenticated]);
+
   const handleLogout = async () => {
     await logout();
     setSidebarOpen(false);
     navigate('/login');
   };
+
+  const handleNavClick = async (event, to) => {
+    if (to === '/' && isAuthenticated) {
+      event.preventDefault();
+      setSidebarOpen(false);
+      await logout();
+      navigate('/', { replace: true });
+      return;
+    }
+    if (!isAuthenticated) setSidebarOpen(false);
+  };
+
+  const isSidebarStatic = isAuthenticated;
+  const hideHeaderBrandOnDesktop = isSidebarStatic && sidebarOpen;
 
   useEffect(() => {
     if (isDarkMode) {
@@ -97,7 +129,7 @@ function AppShell() {
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   return (
-      <div className="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
+      <div className="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col lg:flex-row font-sans transition-colors duration-200">
         {/* Mobile Sidebar Overlay */}
         <AnimatePresence>
           {sidebarOpen && (
@@ -110,15 +142,19 @@ function AppShell() {
             />
           )}
         </AnimatePresence>
-
-        {/* Sidebar Drawer */}
         <aside
           className={`fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
             sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+          } ${
+            isSidebarStatic
+              ? `lg:relative lg:inset-auto lg:translate-x-0 lg:shadow-none lg:z-auto lg:shrink-0 lg:transition-[width] lg:duration-300 lg:ease-in-out ${
+                  sidebarOpen ? 'lg:w-64' : 'lg:w-0 lg:border-r-0 lg:overflow-hidden'
+                }`
+              : ''
           }`}
         >
           <div className="h-16 px-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <Link to="/" onClick={() => setSidebarOpen(false)} className="flex items-center space-x-2.5">
+            <Link to="/" onClick={(e) => handleNavClick(e, '/')} className="flex items-center space-x-2.5">
               <div className="h-8 w-8 rounded-lg bg-slate-900 dark:bg-indigo-600 flex items-center justify-center text-white shadow-sm">
                 <Sparkles className="w-4 h-4" />
               </div>
@@ -141,7 +177,18 @@ function AppShell() {
               <Link
                 key={item.to}
                 to={item.to}
-                onClick={() => setSidebarOpen(false)}
+                onClick={(e) => handleNavClick(e, item.to)}
+                className="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              >
+                <item.icon className="w-4 h-4 text-slate-500" />
+                <span>{item.label}</span>
+              </Link>
+            ))}
+            {user?.is_staff && staffNavItems.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={(e) => handleNavClick(e, item.to)}
                 className="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
                 <item.icon className="w-4 h-4 text-slate-500" />
@@ -174,19 +221,26 @@ function AppShell() {
           </div>
         </aside>
 
+        <div className="flex-1 flex flex-col min-w-0">
+
         {/* Top Navbar */}
         <header className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className=" w-full mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <button
+              {!sidebarOpen && (<button
                 type="button"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
               >
                 <Menu className="w-5 h-5" />
               </button>
-
-              <Link to="/" className="flex items-center space-x-2.5">
+              )}
+              
+              <Link
+                to="/"
+                onClick={(e) => handleNavClick(e, '/')}
+                className={`flex items-center space-x-2.5 ${hideHeaderBrandOnDesktop ? 'lg:hidden' : ''}`}
+              >
                 <div className="h-8 w-8 rounded-lg bg-slate-900 dark:bg-indigo-600 flex items-center justify-center text-white shadow-sm">
                   <Sparkles className="w-4 h-4" />
                 </div>
@@ -197,11 +251,22 @@ function AppShell() {
             </div>
 
             <div className="flex items-center space-x-3">
-              <nav className="hidden md:flex items-center space-x-1">
+              <nav className={`hidden md:flex items-center space-x-1 ${hideHeaderBrandOnDesktop ? 'lg:hidden' : ''}`}>
                 {navItems.map((item) => (
                   <Link
                     key={item.to}
                     to={item.to}
+                    onClick={(e) => handleNavClick(e, item.to)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                {user?.is_staff && staffNavItems.map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={(e) => handleNavClick(e, item.to)}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                   >
                     {item.label}
@@ -209,7 +274,9 @@ function AppShell() {
                 ))}
               </nav>
 
-              <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-800 hidden md:block" />
+              <div
+                className={`h-4 w-[1px] bg-slate-200 dark:bg-slate-800 hidden md:block ${hideHeaderBrandOnDesktop ? 'lg:hidden' : ''}`}
+              />
 
               <button
                 type="button"
@@ -250,6 +317,7 @@ function AppShell() {
           © 2026 PulseControl SaaS Architecture. All rights reserved.
         </footer>
 
+        </div>
       </div>
   );
 }
