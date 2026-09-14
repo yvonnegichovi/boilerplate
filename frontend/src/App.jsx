@@ -235,7 +235,7 @@ function AppShell() {
                 <Menu className="w-5 h-5" />
               </button>
               )}
-              
+
               <Link
                 to="/"
                 onClick={(e) => handleNavClick(e, '/')}

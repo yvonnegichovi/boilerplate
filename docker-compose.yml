@@ -109,7 +109,7 @@ services:
     container_name: boilerplate-flower
 
     command: celery -A core flower --port=5555 --url_prefix=flower
-    
+
     env_file:
       - .env
 
