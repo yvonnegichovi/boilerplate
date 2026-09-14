@@ -1,0 +1,92 @@
+:root {
+  --bs-font-sans-serif: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --bs-primary: #9333ea;
+  --bs-primary-rgb: 147, 51, 234;
+  --bs-primary-bg-subtle: #f3e8ff;
+  --bs-primary-border-subtle: #e9d5ff;
+  --bs-link-color: #9333ea;
+  --bs-link-color-rgb: 147, 51, 234;
+  --bs-link-hover-color: #7e22ce;
+  --bs-link-hover-color-rgb: 126, 34, 206;
+
+  --bs-success: #059669;
+  --bs-success-rgb: 5, 150, 105;
+  --bs-danger: #dc2626;
+  --bs-danger-rgb: 220, 38, 38;
+  --bs-warning: #d97706;
+  --bs-warning-rgb: 217, 119, 6;
+  --bs-secondary: #64748b;
+  --bs-secondary-rgb: 100, 116, 139;
+
+  --bs-body-color: #0f172a;
+  --bs-body-bg: #ffffff;
+  --bs-border-color: #e2e8f0;
+  --bs-border-color-translucent: rgba(15, 23, 42, 0.1);
+  --bs-border-radius: 0.75rem;
+  --bs-border-radius-sm: 0.5rem;
+  --bs-border-radius-lg: 1rem;
+
+  --flower-surface: #ffffff;
+  --flower-surface-subtle: #f8fafc;
+  --flower-text-muted: #64748b;
+  --flower-active: #9333ea;
+  --flower-success: #059669;
+  --flower-warning: #d97706;
+  --flower-danger: #dc2626;
+  --flower-radius: 1rem;
+  --flower-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+[data-bs-theme='dark'] {
+  --bs-body-color: #f1f5f9;
+  --bs-body-color-rgb: 241, 245, 249;
+  --bs-body-bg: #020617;
+  --bs-body-bg-rgb: 2, 6, 23;
+  --bs-border-color: #1e293b;
+  --bs-border-color-translucent: rgba(226, 232, 240, 0.15);
+  --bs-primary: #a855f7;
+  --bs-primary-rgb: 168, 85, 247;
+  --bs-primary-bg-subtle: #2e1065;
+  --bs-primary-border-subtle: #581c87;
+  --bs-link-color: #c084fc;
+  --bs-link-color-rgb: 192, 132, 252;
+  --bs-link-hover-color: #d8b4fe;
+  --bs-link-hover-color-rgb: 216, 180, 254;
+
+  --flower-surface: #0f172a;
+  --flower-surface-subtle: #0b1220;
+  --flower-text-muted: #94a3b8;
+  --flower-active: #a855f7;
+  --flower-success: #34d399;
+  --flower-warning: #fbbf24;
+  --flower-danger: #f87171;
+  --flower-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+body.app-body {
+  font-family: var(--bs-font-sans-serif);
+}
+
+.app-navbar {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+}
+
+[data-bs-theme='dark'] .app-navbar {
+  background: rgba(2, 6, 23, 0.9);
+}
+
+/* Flower hardcodes this one rather than using a variable. */
+.task-state-started {
+  background-color: var(--bs-primary);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-bg: #7e22ce;
+  --bs-btn-hover-border-color: #7e22ce;
+  --bs-btn-active-bg: #7e22ce;
+  --bs-btn-active-border-color: #7e22ce;
+}

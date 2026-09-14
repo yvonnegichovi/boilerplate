@@ -10,3 +10,8 @@ drf-spectacular==0.30.0
 drf-spectacular-sidecar==2026.8.1
 django-filter==26.1
 pre-commit==4.6.2
+celery==5.6.3
+redis==8.1.0
+django-celery-results==2.6.0
+flower==2.1.0
+requests==2.34.2

@@ -51,6 +51,15 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     defaults:
       run:
@@ -70,16 +79,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # APPLY THE ENV VARIABLE HERE AT THE STEP LEVEL
       - name: Run Django system checks
         env:
           DATABASE_URL: postgresql://user:password@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
         run: python manage.py check
 
-      # APPLY IT HERE AS WELL FOR TESTS
       - name: Run tests
         env:
           DATABASE_URL: postgresql://user:password@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
         run: python manage.py test
 
   frontend:
