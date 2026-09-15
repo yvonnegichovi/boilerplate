@@ -9,6 +9,13 @@ from pathlib import Path
 import dj_database_url
 from decouple import Csv, config
 
+DATABASES = {
+    "default": dj_database_url.config(
+        default=config("DATABASE_URL", default=""),
+        conn_max_age=600,
+    )
+}
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -42,6 +49,7 @@ AUTH_USER_MODEL = "authentication.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -71,14 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "core.wsgi.application"
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=config("DATABASE_URL", default=""),
-        conn_max_age=600,
-    )
-}
-
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -106,6 +106,11 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"

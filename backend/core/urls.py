@@ -4,6 +4,7 @@ URL configuration for core project.
 
 from apps.monitoring.flower_proxy import flower_proxy_view
 from apps.organisations.urls import invitation_patterns
+from core.health import health
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -16,6 +17,7 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/health/", health, name="health"),
     # API
     path("api/auth/", include("apps.authentication.urls")),
     path("api/tasks/", include("apps.tasks.urls")),

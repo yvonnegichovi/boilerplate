@@ -1,0 +1,30 @@
+---
+deployment:
+  tasks:
+    - |
+      BRANCH=$(git rev-parse --abbrev-ref HEAD)
+      CPANEL_USER=<cpanel-username>
+      case "$BRANCH" in
+        main)
+          SUFFIX=prod
+          ;;
+        staging)
+          SUFFIX=staging
+          ;;
+        dev)
+          SUFFIX=dev
+          ;;
+        *)
+          echo "Unrecognized branch '$BRANCH' — refusing to deploy." >&2
+          exit 1
+          ;;
+      esac
+
+      DEPLOYPATH="/home/$CPANEL_USER/pulsecontrol_api_${SUFFIX}/"
+      VENV="/home/$CPANEL_USER/virtualenv/pulsecontrol_api_${SUFFIX}/3.x/bin"
+
+      cp -R backend/* "$DEPLOYPATH"
+      "$VENV/pip" install -r "$DEPLOYPATH/requirements.txt"
+      "$VENV/python" "$DEPLOYPATH/manage.py" migrate --noinput
+      "$VENV/python" "$DEPLOYPATH/manage.py" collectstatic --noinput
+      touch "$DEPLOYPATH/tmp/restart.txt"
