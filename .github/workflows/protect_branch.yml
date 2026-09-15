@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Ensure PR comes from dev
+      - name: Ensure PR comes from staging
         run: |
           echo "PR source branch: ${{ github.head_ref }}"
 
-          if [ "${{ github.head_ref }}" != "dev" ]; then
-            echo "Pull requests into main must come from the dev branch."
+          if [ "${{ github.head_ref }}" != "staging" ]; then
+            echo "Pull requests into main must come from the staging branch."
             exit 1
           fi
 
-          echo "✅ Pull request originates from dev."
+          echo "Pull request originates from staging."
