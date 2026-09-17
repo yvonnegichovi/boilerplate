@@ -21,8 +21,7 @@ deployment:
       esac
 
       DEPLOYPATH="/home/$CPANEL_USER/pulsecontrol_api_${SUFFIX}/"
-      VENV="/home/$CPANEL_USER/virtualenv/pulsecontrol_api_${SUFFIX}/3.x/bin"
-
+      VENV="/home/yvonneg6/virtualenv/dev-pulsecontrol-api.yvonnegichovi.com/3.11/bin/activate && cd /home/yvonneg6/dev-pulsecontrol-api.yvonnegichovi.com"
       cp -R backend/* "$DEPLOYPATH"
       "$VENV/pip" install -r "$DEPLOYPATH/requirements.txt"
       "$VENV/python" "$DEPLOYPATH/manage.py" migrate --noinput
