@@ -1,0 +1,22 @@
+name: Validate PR to staging
+
+on:
+  pull_request:
+    branches:
+      - staging
+
+jobs:
+  validate-source-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ensure PR comes from dev
+        run: |
+          echo "PR source branch: ${{ github.head_ref }}"
+
+          if [ "${{ github.head_ref }}" != "dev" ]; then
+            echo "Pull requests into staging must come from the dev branch."
+            exit 1
+          fi
+
+          echo "Pull request originates from dev."

@@ -1,9 +1,13 @@
-name: Development CI
+name: Staging CI
 
 on:
   pull_request:
     branches:
-      - dev
+      - staging
+
+  push:
+    branches:
+      - staging
 
   workflow_dispatch:
 
@@ -51,15 +55,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     defaults:
       run:
@@ -82,13 +77,11 @@ jobs:
       - name: Run Django system checks
         env:
           DATABASE_URL: postgresql://user:password@localhost:5432/test_db
-          REDIS_URL: redis://localhost:6379/0
         run: python manage.py check
 
       - name: Run tests
         env:
           DATABASE_URL: postgresql://user:password@localhost:5432/test_db
-          REDIS_URL: redis://localhost:6379/0
         run: python manage.py test
 
   frontend:
@@ -116,3 +109,17 @@ jobs:
 
       - name: Build application
         run: npm run build
+
+  staging-validation:
+    name: Staging Validation
+    runs-on: ubuntu-latest
+    needs:
+      - backend
+      - frontend
+
+    steps:
+      - name: Staging readiness check
+        run: |
+          echo "Backend validation passed."
+          echo "Frontend build passed."
+          echo "Project is ready for staging."

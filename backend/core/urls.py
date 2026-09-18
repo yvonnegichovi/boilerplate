@@ -2,11 +2,13 @@
 URL configuration for core project.
 """
 
+from apps.monitoring.flower_proxy import flower_proxy_view
 from apps.organisations.urls import invitation_patterns
+from core.health import health
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -15,11 +17,18 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/health/", health, name="health"),
     # API
     path("api/auth/", include("apps.authentication.urls")),
     path("api/tasks/", include("apps.tasks.urls")),
     path("api/organisations/", include("apps.organisations.urls")),
     path("api/invitations/", include(invitation_patterns)),
+    path("api/monitoring/", include("apps.monitoring.urls")),
+    # Authenticated reverse proxy for Flower - deliberately NOT under /api/,
+    # since it has to match the exact browser-facing path the frontend
+    # navigates to (/flower/...) and what Flower's own --url_prefix=flower
+    # asset links point at. See apps.monitoring.flower_proxy.
+    re_path(r"^flower/(?P<path>.*)$", flower_proxy_view, name="flower-proxy"),
     # OpenApi Schema
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     # Swagger UI

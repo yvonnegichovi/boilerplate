@@ -1,0 +1,29 @@
+name: Deploy Backend (Development)
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'backend/**'
+      - '.cpanel.yml'
+      - '.github/workflows/deploy-backend-dev.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger cPanel Git pull + deploy
+        # NOTE: verify the exact UAPI Git module function names/params against
+        # your own cPanel's API Shell before relying on this — syntax has
+        # shifted across cPanel versions. This is the general shape.
+        env:
+          REPO_PATH: ${{ secrets.CPANEL_BACKEND_REPO_PATH_DEV }}
+          USER: ${{ secrets.CPANEL_USER }}
+          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+          HOST: ${{ secrets.CPANEL_HOST }}
+        run: |
+          curl -sf "https://$HOST:2083/execute/Git/update?repository_root=$REPO_PATH" -H "Authorization: cpanel $USER:$TOKEN"
+          curl -sf "https://$HOST:2083/execute/Git/deploy?repository_root=$REPO_PATH" -H "Authorization: cpanel $USER:$TOKEN"

@@ -13,6 +13,11 @@ api.interceptors.request.use((config) => {
 let isRefreshing = false
 let queue = []
 
+let loggingOut = false
+export const setLoggingOut = (value) => {
+    loggingOut = value
+}
+
 const processQueue = (error, token = null) => {
     queue.forEach((p) => (error ? p.reject(error) : p.resolve(token)))
     queue = []
@@ -50,7 +55,7 @@ api.interceptors.response.use(
             processQueue(err, null)
             localStorage.removeItem('access_token')
             localStorage.removeItem('refresh_token')
-            window.location.href = '/login'
+            if (!loggingOut) window.location.href = '/login'
             return Promise.reject(err)
         } finally {
             isRefreshing = false
