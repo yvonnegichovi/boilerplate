@@ -2,17 +2,20 @@
 deployment:
   tasks:
     - |
+      # 1. Detect branch name dynamically from Git
       BRANCH=$(git rev-parse --abbrev-ref HEAD)
-      CPANEL_USER=<cpanel-username>
+      CPANEL_USER="$USER"
+
+      # 2. Map the exact folder names cPanel generated for your domains
       case "$BRANCH" in
         main)
-          SUFFIX=prod
+          FOLDER_NAME="pulsecontrol-api.yvonnegichovi.com"
           ;;
         staging)
-          SUFFIX=staging
+          FOLDER_NAME="staging-pulsecontrol-api.yvonnegichovi.com"
           ;;
         dev)
-          SUFFIX=dev
+          FOLDER_NAME="dev-pulsecontrol-api.yvonnegichovi.com"
           ;;
         *)
           echo "Unrecognized branch '$BRANCH' — refusing to deploy." >&2
@@ -20,10 +23,26 @@ deployment:
           ;;
       esac
 
-      DEPLOYPATH="/home/$CPANEL_USER/pulsecontrol_api_${SUFFIX}/"
-      VENV="/home/yvonneg6/virtualenv/dev-pulsecontrol-api.yvonnegichovi.com/3.11/bin/activate && cd /home/yvonneg6/dev-pulsecontrol-api.yvonnegichovi.com"
-      cp -R backend/* "$DEPLOYPATH"
-      "$VENV/pip" install -r "$DEPLOYPATH/requirements.txt"
-      "$VENV/python" "$DEPLOYPATH/manage.py" migrate --noinput
-      "$VENV/python" "$DEPLOYPATH/manage.py" collectstatic --noinput
+      # 3. Construct the precise target directories and virtual environments
+      DEPLOYPATH="/home/$CPANEL_USER/$FOLDER_NAME"
+      VENV_PATH="/home/$CPANEL_USER/virtualenv/$FOLDER_NAME/3.11/bin"
+
+      echo "Deploying branch [$BRANCH] to $DEPLOYPATH..."
+
+      # 4. Synchronize backend files
+      mkdir -p "$DEPLOYPATH"
+      rsync -avz --delete backend/ "$DEPLOYPATH/"
+
+      # 5. Run Python commands using the absolute paths of each virtual environment's binaries
+      "$VENV_PATH/pip" install --upgrade pip
+      "$VENV_PATH/pip" install -r "$DEPLOYPATH/requirements.txt"
+
+      # 6. Execute Django commands targeting the deployment directory
+      "$VENV_PATH/python" "$DEPLOYPATH/manage.py" migrate --noinput
+      "$VENV_PATH/python" "$DEPLOYPATH/manage.py" collectstatic --noinput
+
+      # 7. Force Phusion Passenger to reload this specific app instance
+      mkdir -p "$DEPLOYPATH/tmp"
       touch "$DEPLOYPATH/tmp/restart.txt"
+
+      echo "Deployment completed successfully for $BRANCH."
