@@ -35,3 +35,6 @@ media/
 .DS_Store
 Thumbs.db
 .neon
+
+# Django static files
+backend/staticfiles/*

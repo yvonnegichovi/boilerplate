@@ -18,8 +18,9 @@ jobs:
       - name: Trigger cPanel Git pull + deploy
         env:
           REPO_PATH: ${{ secrets.CPANEL_BACKEND_REPO_PATH_STAGING }}
-          AUTH: cpanel ${{ secrets.CPANEL_USER }}:${{ secrets.CPANEL_API_TOKEN }}
+          USER: ${{ secrets.CPANEL_USER }}
+          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
           HOST: ${{ secrets.CPANEL_HOST }}
         run: |
-          curl -sf "https://$HOST:2083/execute/Git/update?repository_root=$REPO_PATH" -H "Authorization: $AUTH"
-          curl -sf "https://$HOST:2083/execute/Git/deploy?repository_root=$REPO_PATH" -H "Authorization: $AUTH"
+          curl -sf "https://$HOST:2083/execute/Git/update?repository_root=$REPO_PATH" -H "Authorization: cpanel $USER:$TOKEN"
+          curl -sf "https://$HOST:2083/execute/Git/deploy?repository_root=$REPO_PATH" -H "Authorization: cpanel $USER:$TOKEN" 
