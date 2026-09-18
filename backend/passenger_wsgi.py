@@ -1,11 +1,19 @@
 import os
 import sys
 
-# Add the running application path to the system path
-sys.path.append(os.getcwd())
+# Get the current directory path
+current_dir = os.path.dirname(__file__)
+sys.path.insert(0, current_dir)
 
-# Point to your core settings
-os.environ['DJANGO_SETTINGS_MODULE'] = 'core.settings'
+# If the automated sync placed core inside a 'backend' subfolder, add that path too
+backend_dir = os.path.join(current_dir, "backend")
+if os.path.exists(backend_dir):
+    sys.path.insert(0, backend_dir)
 
-# Import the WSGI application object cPanel's server expects
-from core.wsgi import application
+os.environ["DJANGO_SETTINGS_MODULE"] = "core.settings"
+
+try:
+    from core.wsgi import application  # noqa: E402, F401
+except ImportError:
+    # Fallback to handle alternative pathing strategies
+    from backend.core.wsgi import application  # noqa: E402, F401
