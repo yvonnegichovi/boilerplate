@@ -1,7 +1,7 @@
 const ROLE_STYLES = {
-    owner: 'badge badge-owner',
-    admin: 'badge badge-admin',
-    member: 'badge badge-member',
+    owner: 'bg-amber-100 text-amber-700 border-amber-200',
+    admin: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+    member: 'bg-slate-100 text-slate-600 border-slate-200',
 }
 
 const ROLE_LABELS = {
@@ -13,7 +13,7 @@ const ROLE_LABELS = {
 export default function RoleBadge({ role }) {
     if (!role) return null
     return (
-        <span className={ROLE_STYLES[role] || 'badge'}>
+        <span className={`inline-flex items-center text-xs px-2.5 py-1 rounded-full font-medium border ${ROLE_STYLES[role] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
             {ROLE_LABELS[role] || role}
         </span>
     )
