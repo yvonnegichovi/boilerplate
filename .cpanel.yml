@@ -7,13 +7,13 @@ deployment:
 
       case "$BRANCH" in
         main)
-          FOLDER_NAME="://yvonnegichovi.com"
+          FOLDER_NAME="pulsecontrol-api.yvonnegichovi.com"
           ;;
         staging)
-          FOLDER_NAME="staging-://yvonnegichovi.com"
+          FOLDER_NAME="staging-pulsecontrol-api.yvonnegichovi.com"
           ;;
         dev)
-          FOLDER_NAME="dev-://yvonnegichovi.com"
+          FOLDER_NAME="dev-pulsecontrol-api.yvonnegichovi.com"
           ;;
         *)
           echo "Unrecognized branch '$BRANCH' — refusing to deploy." >&2
