@@ -25,5 +25,5 @@ jobs:
           TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
           HOST: ${{ secrets.CPANEL_HOST }}
         run: |
-          curl -sf "https://$HOST:2083/execute/Git/update?repository_root=$REPO_PATH" -H "Authorization: cpanel $USER:$TOKEN"
-          curl -sf "https://$HOST:2083/execute/Git/deploy?repository_root=$REPO_PATH" -H "Authorization: cpanel $USER:$TOKEN"
+          curl -sf "https://$HOST:2083/execute/VersionControl/update?repository_root=$REPO_PATH" -H "Authorization: cpanel $USER:$TOKEN"
+          curl -sf "https://$HOST:2083/execute/VersionControl/deploy?repository_root=$REPO_PATH" -H "Authorization: cpanel $USER:$TOKEN"

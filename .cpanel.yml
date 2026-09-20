@@ -11,7 +11,7 @@ deployment:
       echo "========================================"
 
       # Deploy Django application files from backend/
-      rsync -avz --delete --ignore-times \
+      rsync -avz --ignore-times \
         backend/ \
         "$DEPLOYPATH/"
 
