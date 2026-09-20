@@ -14,16 +14,36 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Trigger cPanel Git pull + deploy
-        # NOTE: verify the exact UAPI Git module function names/params against
-        # your own cPanel's API Shell before relying on this — syntax has
-        # shifted across cPanel versions. This is the general shape.
+      - name: Update cPanel repository and deploy
         env:
           REPO_PATH: ${{ secrets.CPANEL_BACKEND_REPO_PATH_DEV }}
           USER: ${{ secrets.CPANEL_USER }}
           TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
           HOST: ${{ secrets.CPANEL_HOST }}
+
         run: |
-          curl -sf "https://$HOST:2083/execute/VersionControl/update?repository_root=$REPO_PATH" -H "Authorization: cpanel $USER:$TOKEN"
-          curl -sf "https://$HOST:2083/execute/VersionControl/deploy?repository_root=$REPO_PATH" -H "Authorization: cpanel $USER:$TOKEN"
+          set -e
+
+          echo "Updating cPanel repository..."
+          echo "Repository: $REPO_PATH"
+
+          RESPONSE=$(curl -sS \
+            -H "Authorization: cpanel $USER:$TOKEN" \
+            "https://$HOST:2083/execute/VersionControl/update?repository_root=$REPO_PATH")
+
+          echo "$RESPONSE"
+
+          STATUS=$(echo "$RESPONSE" | python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          print(data.get('status', 0))
+          ")
+
+          if [ "$STATUS" != "1" ]; then
+            echo "cPanel repository update/deployment failed."
+            exit 1
+          fi
+
+          echo "cPanel repository updated and deployment triggered successfully."
