@@ -31,7 +31,7 @@ jobs:
           VITE_API_BASE_URL: https://dev-pulsecontrol-api.yvonnegichovi.com/api
 
       - name: Deploy to cPanel via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.CPANEL_FTP_SERVER }}
           username: ${{ secrets.CPANEL_FTP_USERNAME_DEV }}
