@@ -4,56 +4,88 @@ deployment:
     - |
       set -e
 
-      DEPLOYPATH="/home/yvonneg6/dev-pulsecontrol-api.yvonnegichovi.com"
-      VENV_PATH="/home/yvonneg6/virtualenv/dev-pulsecontrol-api.yvonnegichovi.com/3.11/bin"
+      # ------------------------------------------------------------
+      # Pick target by the branch this cPanel repo has checked out.
+      # Same file lives on every branch, so merges never conflict.
+      # ------------------------------------------------------------
+      BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+      CPANEL_HOME="/home/yvonneg6"
+
+      case "$BRANCH" in
+        dev|develop)
+          ENV_NAME="DEVELOPMENT"
+          DOMAIN="dev-pulsecontrol-api.yvonnegichovi.com"
+          ;;
+        staging)
+          ENV_NAME="STAGING"
+          DOMAIN="staging-pulsecontrol-api.yvonnegichovi.com"   # TODO: confirm
+          ;;
+        main|master)
+          ENV_NAME="PRODUCTION"
+          DOMAIN="pulsecontrol-api.yvonnegichovi.com"           # TODO: confirm
+          ;;
+        *)
+          echo "No deployment configured for branch '$BRANCH'. Skipping."
+          exit 0
+          ;;
+      esac
+
+      DEPLOYPATH="$CPANEL_HOME/$DOMAIN"
+      VENV_PATH="$CPANEL_HOME/virtualenv/$DOMAIN/3.11/bin"
 
       echo "========================================"
-      echo "Starting DEVELOPMENT deployment"
+      echo "Starting $ENV_NAME deployment (branch: $BRANCH)"
       echo "Deploy path: $DEPLOYPATH"
       echo "========================================"
 
-      echo "Checking repository..."
-      pwd
-      echo "Repository contents:"
-      ls -la
-      echo "Backend contents:"
-      ls -la backend/
-
-      echo "Deploying Django application..."
-
-      mkdir -p "$DEPLOYPATH"
-
-      cp -a backend/. "$DEPLOYPATH/"
-
-      echo "Deployment files copied."
-
-      echo "Checking deployed files..."
-      ls -la "$DEPLOYPATH"
-
-      if [ ! -f "$DEPLOYPATH/manage.py" ]; then
-        echo "ERROR: manage.py was not deployed."
+      if [ ! -d backend ]; then
+        echo "ERROR: backend/ not found in $(pwd)"
         exit 1
       fi
 
-      if [ ! -f "$DEPLOYPATH/requirements.txt" ]; then
-        echo "ERROR: requirements.txt was not deployed."
+      if [ ! -x "$VENV_PATH/python" ]; then
+        echo "ERROR: virtualenv not found at $VENV_PATH"
+        echo "Create the app in Setup Python App first."
         exit 1
+      fi
+
+      echo "Copying files..."
+      mkdir -p "$DEPLOYPATH"
+      cp -a backend/. "$DEPLOYPATH/"
+
+      for f in manage.py requirements.txt; do
+        if [ ! -f "$DEPLOYPATH/$f" ]; then
+          echo "ERROR: $f was not deployed."
+          exit 1
+        fi
+      done
+
+      # Run Django commands from the project folder.
+      cd "$DEPLOYPATH"
+
+      # Deploy tasks do NOT receive the env vars set in Setup Python App.
+      # Load them from a .env file on the server (never commit it).
+      if [ -f "$DEPLOYPATH/.env" ]; then
+        set -a
+        . "$DEPLOYPATH/.env"
+        set +a
+      else
+        echo "WARNING: $DEPLOYPATH/.env not found; Django may lack settings."
       fi
 
       echo "Installing Python dependencies..."
-      "$VENV_PATH/pip" install --upgrade pip
-      "$VENV_PATH/pip" install -r "$DEPLOYPATH/requirements.txt"
+      "$VENV_PATH/pip" install -r requirements.txt
 
-      echo "Running database migrations..."
-      "$VENV_PATH/python" "$DEPLOYPATH/manage.py" migrate --noinput
+      echo "Running migrations..."
+      "$VENV_PATH/python" manage.py migrate --noinput
 
       echo "Collecting static files..."
-      "$VENV_PATH/python" "$DEPLOYPATH/manage.py" collectstatic --noinput
+      "$VENV_PATH/python" manage.py collectstatic --noinput
 
-      echo "Restarting Passenger application..."
-      mkdir -p "$DEPLOYPATH/tmp"
-      touch "$DEPLOYPATH/tmp/restart.txt"
+      echo "Restarting application..."
+      mkdir -p tmp
+      touch tmp/restart.txt
 
       echo "========================================"
-      echo "DEVELOPMENT deployment completed"
+      echo "$ENV_NAME deployment completed"
       echo "========================================"
