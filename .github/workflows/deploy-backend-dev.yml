@@ -1,0 +1,49 @@
+name: Deploy Backend (Development)
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'backend/**'
+      - '.cpanel.yml'
+      - '.github/workflows/deploy-backend-dev.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Update cPanel repository and deploy
+        env:
+          REPO_PATH: ${{ secrets.CPANEL_BACKEND_REPO_PATH_DEV }}
+          USER: ${{ secrets.CPANEL_USER }}
+          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+          HOST: ${{ secrets.CPANEL_HOST }}
+
+        run: |
+          set -e
+
+          echo "Updating cPanel repository..."
+          echo "Repository: $REPO_PATH"
+
+          RESPONSE=$(curl -sS \
+            -H "Authorization: cpanel $USER:$TOKEN" \
+            "https://$HOST:2083/execute/VersionControl/update?repository_root=$REPO_PATH")
+
+          echo "$RESPONSE"
+
+          STATUS=$(echo "$RESPONSE" | python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          print(data.get('status', 0))
+          ")
+
+          if [ "$STATUS" != "1" ]; then
+            echo "cPanel repository update/deployment failed."
+            exit 1
+          fi
+
+          echo "cPanel repository updated and deployment triggered successfully."

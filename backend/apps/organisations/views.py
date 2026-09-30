@@ -39,6 +39,7 @@ from .serializers import (
     OrganisationWriteSerializer,
     UpdateMemberRoleSerializer,
 )
+from .tasks import send_invitation_email
 
 User = get_user_model()
 
@@ -190,6 +191,7 @@ class InvitationListCreateView(generics.ListCreateAPIView):
             organisation=self.request.org, invited_by=self.request.user
         )
         logger.info("Invitation created successfully.")
+        send_invitation_email.delay(str(invitation.id))
         return Response(
             InvitationSerializer(invitation).data,
             status=status.HTTP_201_CREATED,

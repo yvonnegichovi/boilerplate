@@ -47,6 +47,7 @@ A modern full-stack boilerplate built with **Django** and **React (Vite)**, prov
 - [x] `docs.py` convention — OpenAPI decorators separated from business logic
 - [x] Full backend test suite — models, serializers, and API endpoints
 - [x] CI/CD pipeline with GitHub Actions (dev and production workflows)
+- [x] Celery + Celery Beat background tasks (Redis broker, Postgres-backed results), a Flower dashboard, and a staff-only performance page at `/admin/celery`
 
 ### Coming Soon
 - [ ] Tasks module — CRUD with status, priority, and due dates
@@ -163,6 +164,8 @@ DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
 DATABASE_URL=postgres://my_django_user:your_password@localhost:5432/my_local_db
 CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+REDIS_URL=redis://localhost:6379/0
+FLOWER_BASIC_AUTH=
 ```
 
 ---
@@ -217,6 +220,58 @@ python manage.py runserver
 | `http://localhost:8000/admin/` | Django admin |
 | `http://localhost:8000/api/docs/` | Swagger UI |
 | `http://localhost:8000/api/redoc/` | ReDoc |
+
+---
+
+## Background Tasks (Celery)
+
+Celery runs background/scheduled work against a Redis broker; task results are
+stored in Postgres via `django-celery-results` (queryable from the ORM, no
+extra infra). Celery Beat schedules periodic tasks (configured in
+`backend/core/celery.py`, e.g. the demo `heartbeat` task). Flower provides a
+live dashboard, and a staff-only performance page in the frontend
+(`/admin/celery`) surfaces the same data through our own API.
+
+**Easiest path — Docker Compose** (spins up Postgres, Redis, the Django app,
+a Celery worker, Celery Beat, and Flower):
+
+```bash
+docker compose up
+```
+
+**Running manually** (each in its own terminal, with `REDIS_URL` set and the
+venv activated):
+
+```bash
+celery -A core worker -l info
+celery -A core beat -l info
+celery -A core flower --port=5555 --url_prefix=flower --address=127.0.0.1
+```
+
+`--url_prefix=flower` matters even for local/manual runs: it makes Flower
+generate its own links and static asset URLs already prefixed with
+`/flower/...`, matching what Django proxies at `/flower/` (see below).
+Without it, Flower serves fine directly on its own port but its assets 404
+when accessed through that proxied path. `--address=127.0.0.1` keeps
+Flower's raw port off the network - only the Django backend needs to reach
+it (docker-compose does the equivalent by simply not publishing Flower's
+port to the host at all).
+
+**Flower isn't reachable directly** - `/flower/` is an authenticated reverse
+proxy in Django (`apps.monitoring.flower_proxy`), not Vite or Flower itself.
+A plain page load carries no JWT (that's only ever attached to XHR calls by
+the frontend), so access works in two hops: the frontend first calls
+`GET /api/monitoring/flower/session/` (staff-only, like every other
+monitoring endpoint) to mint a short-lived cookie, *then* navigates the
+browser to `/flower/`, which the proxy checks on every request before
+forwarding through to the real Flower process (`FLOWER_INTERNAL_URL`) and
+injecting `frontend/public/celery-flower-theme.css` into its HTML. Hitting
+`/flower/` cold redirects to `/admin/login?next=/flower/`.
+
+| URL | Description |
+|-----|-------------|
+| `http://localhost:5173/admin/celery` | Frontend performance page (staff/superuser only) — the "Open Flower" button on this page links out to Flower |
+| `http://localhost:5173/flower/` | Flower dashboard, themed to match this app and gated by the proxy above - a separate service with its own UI, not part of this app |
 
 ---
 

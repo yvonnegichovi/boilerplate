@@ -22,6 +22,7 @@ from rest_framework.views import APIView
 from .docs import TASK_FILTERS, TASKS_TAG
 from .models import Task
 from .serializers import TaskSerializer, TaskWriteSerializer
+from .tasks import send_task_created_email
 
 
 @extend_schema_view(
@@ -77,6 +78,7 @@ class TaskListCreateView(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+        send_task_created_email.delay(str(serializer.instance.id))
         return Response(
             TaskSerializer(
                 serializer.instance, context=self.get_serializer_context()

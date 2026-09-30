@@ -2,7 +2,7 @@ import api from './client'
 
 // Tasks can be personal (no slug -> /tasks/) or org-scoped
 // (slug provided -> /organisations/{slug}/tasks/).
-const basePath = (slug) => (slug ? `/organisations/${slug}/tasks` : '/tasks/')
+const basePath = (slug) => (slug ? `/organisations/${slug}/tasks/` : '/tasks/')
 
 export const taskApi = {
     list: (params, slug) => api.get(basePath(slug), { params }),

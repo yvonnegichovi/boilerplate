@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { authApi } from '../api/auth'
+import { setLoggingOut } from '../api/client'
 
 const useAuthStore = create((set, get) => ({
     user: null,
@@ -28,6 +29,7 @@ const useAuthStore = create((set, get) => ({
             const { data } = await authApi.login(email, password)
             localStorage.setItem('access_token', data.access)
             localStorage.setItem('refresh_token', data.refresh)
+            setLoggingOut(false)
             set({ user: data.user, isAuthenticated: true, isLoading: false })
             return { success: true }
         } catch (err) {
@@ -38,6 +40,7 @@ const useAuthStore = create((set, get) => ({
     },
 
     logout: async () => {
+        setLoggingOut(true)
         const refresh = localStorage.getItem('refresh_token')
         try { await authApi.logout(refresh) } catch (_) {}
         localStorage.removeItem('access_token')

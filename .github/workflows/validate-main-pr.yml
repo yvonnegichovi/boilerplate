@@ -10,10 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Ensure PR comes from dev
+      - name: Ensure PR comes from staging
         run: |
-          if [[ "${{ github.head_ref }}" != "dev" ]]; then
-            echo "Only the dev branch can be merged into main."
+          echo "PR source branch: ${{ github.head_ref }}"
+
+          if [ "${{ github.head_ref }}" != "staging" ]; then
+            echo "Only the staging branch can be merged into main."
             exit 1
           fi
 

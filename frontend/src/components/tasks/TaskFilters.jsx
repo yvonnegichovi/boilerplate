@@ -1,9 +1,13 @@
+const selectClass =
+    'w-auto px-3 py-2 rounded-xl border border-purple-100 bg-white text-slate-700 text-xs font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition'
+
 export default function TaskFilters({ filters, onChange }) {
     const handle = (key, value) => onChange({ ...filters, [key]: value })
 
     return (
-        <div className="task-filters">
+        <div className="task-filters flex flex-wrap gap-2">
             <select
+                className={selectClass}
                 value={filters.status || ''}
                 onChange={(e) => handle('status', e.target.value)}
             >
@@ -14,6 +18,7 @@ export default function TaskFilters({ filters, onChange }) {
             </select>
 
             <select
+                className={selectClass}
                 value={filters.priority || ''}
                 onChange={(e) => handle('priority', e.target.value)}
             >
@@ -24,6 +29,7 @@ export default function TaskFilters({ filters, onChange }) {
             </select>
 
             <select
+                className={selectClass}
                 value={filters.ordering || '-created_at'}
                 onChange={(e) => handle('ordering', e.target.value)}
             >
