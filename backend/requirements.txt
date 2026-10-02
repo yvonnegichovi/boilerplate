@@ -13,7 +13,7 @@ pre-commit==4.6.2
 celery==5.6.3
 redis==8.1.0
 django-celery-results==2.6.0
-flower==2.1.0
+flower==2.2.0
 requests==2.34.2
 whitenoise==6.11.0
 python-dotenv==1.2.3
