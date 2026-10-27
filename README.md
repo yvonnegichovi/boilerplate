@@ -98,7 +98,7 @@ A modern full-stack boilerplate built with **Django** and **React (Vite)**, prov
 ### Prerequisites
 
 - Python 3.11+
-- Node.js 22+
+- Node.js 24.22.1
 - PostgreSQL 15+
 - Git
 

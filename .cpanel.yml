@@ -5,24 +5,28 @@ deployment:
       set -e
 
       # ------------------------------------------------------------
-      # Pick target by the branch this cPanel repo has checked out.
+      # Pick targets by the branch this cPanel repo has checked out.
       # Same file lives on every branch, so merges never conflict.
       # ------------------------------------------------------------
       BRANCH="$(git rev-parse --abbrev-ref HEAD)"
       CPANEL_HOME="/home/yvonneg6"
+      REPO_DIR="$(pwd)"
 
       case "$BRANCH" in
         dev|develop)
           ENV_NAME="DEVELOPMENT"
-          DOMAIN="dev-pulsecontrol-api.yvonnegichovi.com"
+          API_DOMAIN="dev-pulsecontrol-api.yvonnegichovi.com"
+          FRONT_DOMAIN="dev-pulsecontrol.yvonnegichovi.com"
           ;;
         staging)
           ENV_NAME="STAGING"
-          DOMAIN="staging-pulsecontrol-api.yvonnegichovi.com"   # TODO: confirm
+          API_DOMAIN="staging-pulsecontrol-api.yvonnegichovi.com"
+          FRONT_DOMAIN="staging-pulsecontrol.yvonnegichovi.com"
           ;;
         main|master)
           ENV_NAME="PRODUCTION"
-          DOMAIN="pulsecontrol-api.yvonnegichovi.com"           # TODO: confirm
+          API_DOMAIN="pulsecontrol-api.yvonnegichovi.com"
+          FRONT_DOMAIN="pulsecontrol.yvonnegichovi.com"
           ;;
         *)
           echo "No deployment configured for branch '$BRANCH'. Skipping."
@@ -30,16 +34,20 @@ deployment:
           ;;
       esac
 
-      DEPLOYPATH="$CPANEL_HOME/$DOMAIN"
-      VENV_PATH="$CPANEL_HOME/virtualenv/$DOMAIN/3.11/bin"
-
       echo "========================================"
       echo "Starting $ENV_NAME deployment (branch: $BRANCH)"
-      echo "Deploy path: $DEPLOYPATH"
       echo "========================================"
 
-      if [ ! -d backend ]; then
-        echo "ERROR: backend/ not found in $(pwd)"
+      # ============================================================
+      # BACKEND (Django)
+      # ============================================================
+      DEPLOYPATH="$CPANEL_HOME/$API_DOMAIN"
+      VENV_PATH="$CPANEL_HOME/virtualenv/$API_DOMAIN/3.11/bin"
+
+      echo "---- Backend -> $DEPLOYPATH"
+
+      if [ ! -d "$REPO_DIR/backend" ]; then
+        echo "ERROR: backend/ not found in $REPO_DIR"
         exit 1
       fi
 
@@ -49,9 +57,8 @@ deployment:
         exit 1
       fi
 
-      echo "Copying files..."
       mkdir -p "$DEPLOYPATH"
-      cp -a backend/. "$DEPLOYPATH/"
+      cp -a "$REPO_DIR/backend/." "$DEPLOYPATH/"
 
       for f in manage.py requirements.txt; do
         if [ ! -f "$DEPLOYPATH/$f" ]; then
@@ -60,15 +67,11 @@ deployment:
         fi
       done
 
-      # Run Django commands from the project folder.
       cd "$DEPLOYPATH"
 
       # Deploy tasks do NOT receive the env vars set in Setup Python App.
-      # Load them from a .env file on the server (never commit it).
-      if [ -f "$DEPLOYPATH/.env" ]; then
-        set -a
-        . "$DEPLOYPATH/.env"
-        set +a
+      if [ -f .env ]; then
+        set -a; . ./.env; set +a
       else
         echo "WARNING: $DEPLOYPATH/.env not found; Django may lack settings."
       fi
@@ -85,6 +88,62 @@ deployment:
       echo "Restarting application..."
       mkdir -p tmp
       touch tmp/restart.txt
+      echo "Backend done."
+
+      # ============================================================
+      # FRONTEND (static Vite + React build)
+      # ============================================================
+      FRONT_PATH="$CPANEL_HOME/$FRONT_DOMAIN"
+      echo "---- Frontend -> $FRONT_PATH"
+
+      cd "$REPO_DIR/frontend"
+
+      # Pin an exact Node version. CloudLinux's /opt/alt/alt-nodejs24 only
+      # offers whatever 24.x patch the host installed, so fetch the official
+      # binary once and cache it in the home directory.
+      NODE_VERSION="24.22.1"
+      NODE_DIST="node-v$NODE_VERSION-linux-x64"
+      NODE_HOME="$CPANEL_HOME/.local/$NODE_DIST"
+
+      if [ ! -x "$NODE_HOME/bin/node" ]; then
+        echo "Installing Node $NODE_VERSION to $NODE_HOME..."
+        TMP_DIR="$(mktemp -d)"
+        BASE_URL="https://nodejs.org/dist/v$NODE_VERSION"
+        curl -fsSL -o "$TMP_DIR/$NODE_DIST.tar.xz" "$BASE_URL/$NODE_DIST.tar.xz"
+        curl -fsSL -o "$TMP_DIR/SHASUMS256.txt" "$BASE_URL/SHASUMS256.txt"
+        (cd "$TMP_DIR" && grep " $NODE_DIST.tar.xz\$" SHASUMS256.txt | sha256sum -c -)
+        mkdir -p "$CPANEL_HOME/.local"
+        tar -xJf "$TMP_DIR/$NODE_DIST.tar.xz" -C "$CPANEL_HOME/.local"
+        rm -rf "$TMP_DIR"
+      fi
+
+      export PATH="$NODE_HOME/bin:$PATH"
+      if [ "$(node -v)" != "v$NODE_VERSION" ]; then
+        echo "ERROR: expected Node v$NODE_VERSION, got $(node -v)"
+        exit 1
+      fi
+      echo "Using Node $(node -v)"
+
+      # Vite bakes VITE_* vars into the build, so set the API URL here.
+      export VITE_API_URL="https://$API_DOMAIN"
+
+      if [ -f package-lock.json ]; then
+        npm ci
+      else
+        npm install
+      fi
+      npm run build
+
+      if [ ! -f dist/index.html ]; then
+        echo "ERROR: build did not produce dist/index.html"
+        exit 1
+      fi
+
+      mkdir -p "$FRONT_PATH"
+      # Clear old hashed bundles, keep .htaccess/.well-known etc.
+      rm -rf "$FRONT_PATH/assets"
+      cp -a dist/. "$FRONT_PATH/"
+      echo "Frontend done."
 
       echo "========================================"
       echo "$ENV_NAME deployment completed"
