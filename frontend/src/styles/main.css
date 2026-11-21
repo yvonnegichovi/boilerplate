@@ -306,8 +306,8 @@ body {
 .org-tab:hover { color: var(--color-text); }
 .org-tab-active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
 
-/* ── Overview stats ───────────────────────────────────────────────────── */
-.org-overview {
+/* ── Home stats ───────────────────────────────────────────────────── */
+.org-home-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
@@ -324,7 +324,7 @@ body {
 .stat-card-warning { border-color: #fca5a5; }
 .stat-card-warning .stat-value { color: var(--color-error); }
 
-/* ── Dashboard sections (org overview widgets) ───────────────────────── */
+/* ── Dashboard sections (org home widgets) ───────────────────────── */
 .dashboard-section { margin-top: 1.75rem; }
 .dashboard-section-title { font-size: 1.05rem; margin-bottom: .9rem; }
 
