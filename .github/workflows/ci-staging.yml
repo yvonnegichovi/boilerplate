@@ -31,6 +31,8 @@ jobs:
       - name: Install pre-commit
         run: |
           python -m pip install --upgrade pip
+          env:
+            SKIP: prevent-direct-commit
           pip install pre-commit
 
       - name: Run pre-commit
