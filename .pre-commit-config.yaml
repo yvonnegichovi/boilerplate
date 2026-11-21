@@ -71,7 +71,7 @@ repos:
           bash -c '
           BRANCH=$(git branch --show-current)
 
-          if [[ "$BRANCH" == "main" || "$BRANCH" == "dev" ]]; then
+          if [[ "$BRANCH" == "main" || "$BRANCH" == "staging" ]]; then
               echo ""
               echo "Direct commits to $BRANCH are not allowed."
               echo "Create a feature branch instead."

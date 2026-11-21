@@ -5,24 +5,26 @@ deployment:
       set -e
 
       # ------------------------------------------------------------
-      # Pick target by the branch this cPanel repo has checked out.
+      # Pick the target by the branch this cPanel repo has checked out.
       # Same file lives on every branch, so merges never conflict.
+      # Backend only: the frontend is built and uploaded by GitHub Actions.
       # ------------------------------------------------------------
       BRANCH="$(git rev-parse --abbrev-ref HEAD)"
       CPANEL_HOME="/home/yvonneg6"
+      REPO_DIR="$(pwd)"
 
       case "$BRANCH" in
         dev|develop)
           ENV_NAME="DEVELOPMENT"
-          DOMAIN="dev-pulsecontrol-api.yvonnegichovi.com"
+          API_DOMAIN="dev-pulsecontrol-api.yvonnegichovi.com"
           ;;
         staging)
           ENV_NAME="STAGING"
-          DOMAIN="staging-pulsecontrol-api.yvonnegichovi.com"   # TODO: confirm
+          API_DOMAIN="staging-pulsecontrol-api.yvonnegichovi.com"
           ;;
         main|master)
           ENV_NAME="PRODUCTION"
-          DOMAIN="pulsecontrol-api.yvonnegichovi.com"           # TODO: confirm
+          API_DOMAIN="pulsecontrol-api.yvonnegichovi.com"
           ;;
         *)
           echo "No deployment configured for branch '$BRANCH'. Skipping."
@@ -30,16 +32,20 @@ deployment:
           ;;
       esac
 
-      DEPLOYPATH="$CPANEL_HOME/$DOMAIN"
-      VENV_PATH="$CPANEL_HOME/virtualenv/$DOMAIN/3.11/bin"
-
       echo "========================================"
       echo "Starting $ENV_NAME deployment (branch: $BRANCH)"
-      echo "Deploy path: $DEPLOYPATH"
       echo "========================================"
 
-      if [ ! -d backend ]; then
-        echo "ERROR: backend/ not found in $(pwd)"
+      # ============================================================
+      # BACKEND (Django)
+      # ============================================================
+      DEPLOYPATH="$CPANEL_HOME/$API_DOMAIN"
+      VENV_PATH="$CPANEL_HOME/virtualenv/$API_DOMAIN/3.11/bin"
+
+      echo "---- Backend -> $DEPLOYPATH"
+
+      if [ ! -d "$REPO_DIR/backend" ]; then
+        echo "ERROR: backend/ not found in $REPO_DIR"
         exit 1
       fi
 
@@ -49,9 +55,8 @@ deployment:
         exit 1
       fi
 
-      echo "Copying files..."
       mkdir -p "$DEPLOYPATH"
-      cp -a backend/. "$DEPLOYPATH/"
+      cp -a "$REPO_DIR/backend/." "$DEPLOYPATH/"
 
       for f in manage.py requirements.txt; do
         if [ ! -f "$DEPLOYPATH/$f" ]; then
@@ -60,15 +65,11 @@ deployment:
         fi
       done
 
-      # Run Django commands from the project folder.
       cd "$DEPLOYPATH"
 
       # Deploy tasks do NOT receive the env vars set in Setup Python App.
-      # Load them from a .env file on the server (never commit it).
-      if [ -f "$DEPLOYPATH/.env" ]; then
-        set -a
-        . "$DEPLOYPATH/.env"
-        set +a
+      if [ -f .env ]; then
+        set -a; . ./.env; set +a
       else
         echo "WARNING: $DEPLOYPATH/.env not found; Django may lack settings."
       fi
