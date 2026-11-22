@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { AlertCircle } from 'lucide-react'
 import useOrgStore from '../../context/orgStore'
 import Avatar from './Avatar'
+import Modal from '../common/Modal'
+import { labelClass, inputClass, cancelButtonClass, submitButtonClass, errorAlertClass, fieldErrorClass } from '../common/formStyles'
 
 export default function OrganisationForm({ org = null, onClose, onSuccess }) {
     const { createOrganisation, updateOrganisation, isSubmitting, error } = useOrgStore()
@@ -42,50 +45,47 @@ export default function OrganisationForm({ org = null, onClose, onSuccess }) {
     }
 
     return (
-        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="modal">
-                <div className="modal-header">
-                    <h2>{isEditing ? 'Organisation settings' : 'New organisation'}</h2>
-                    <button className="modal-close" onClick={onClose}>✕</button>
+        <Modal title={isEditing ? 'Organisation settings' : 'New organisation'} onClose={onClose}>
+            {error?.name && (
+                <div className={errorAlertClass}>
+                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span>{Array.isArray(error.name) ? error.name[0] : error.name}</span>
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+                <div>
+                    <label className={labelClass}>
+                        Logo <span className="normal-case font-normal text-slate-400">(optional)</span>
+                    </label>
+                    <div className="flex items-center gap-4">
+                        <Avatar src={logoPreview} name={org?.name} size={56} />
+                        <label className="cursor-pointer px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition">
+                            Choose image
+                            <input type="file" accept="image/*" onChange={handleLogoChange} hidden />
+                        </label>
+                    </div>
                 </div>
 
-                {error?.name && (
-                    <div className="alert alert-error">
-                        {Array.isArray(error.name) ? error.name[0] : error.name}
-                    </div>
-                )}
+                <div>
+                    <label className={labelClass}>Organisation name</label>
+                    <input
+                        {...register('name', { required: 'Name is required' })}
+                        placeholder="Acme Inc."
+                        className={inputClass}
+                    />
+                    {errors.name && <p className={fieldErrorClass}>{errors.name.message}</p>}
+                </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} noValidate>
-                    <div className="field logo-field">
-                        <label>Logo <span className="field-optional">(optional)</span></label>
-                        <div className="logo-picker">
-                            <Avatar src={logoPreview} name={org?.name} size={56} />
-                            <label className="btn btn-outline logo-upload-btn">
-                                Choose image
-                                <input type="file" accept="image/*" onChange={handleLogoChange} hidden />
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="field">
-                        <label>Organisation name</label>
-                        <input
-                            {...register('name', { required: 'Name is required' })}
-                            placeholder="Acme Inc."
-                        />
-                        {errors.name && <span className="field-error">{errors.name.message}</span>}
-                    </div>
-
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-outline" onClick={onClose}>
-                            Cancel
-                        </button>
-                        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                            {isSubmitting ? 'Saving...' : isEditing ? 'Save changes' : 'Create organisation'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <div className="flex justify-end gap-3 pt-2">
+                    <button type="button" className={cancelButtonClass} onClick={onClose}>
+                        Cancel
+                    </button>
+                    <button type="submit" className={submitButtonClass} disabled={isSubmitting}>
+                        {isSubmitting ? 'Saving...' : isEditing ? 'Save changes' : 'Create organisation'}
+                    </button>
+                </div>
+            </form>
+        </Modal>
     )
 }

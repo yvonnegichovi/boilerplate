@@ -1,0 +1,92 @@
+---
+deployment:
+  tasks:
+    - |
+      set -e
+
+      # ------------------------------------------------------------
+      # Pick the target by the branch this cPanel repo has checked out.
+      # Same file lives on every branch, so merges never conflict.
+      # Backend only: the frontend is built and uploaded by GitHub Actions.
+      # ------------------------------------------------------------
+      BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+      CPANEL_HOME="/home/yvonneg6"
+      REPO_DIR="$(pwd)"
+
+      case "$BRANCH" in
+        dev|develop)
+          ENV_NAME="DEVELOPMENT"
+          API_DOMAIN="dev-pulsecontrol-api.yvonnegichovi.com"
+          ;;
+        staging)
+          ENV_NAME="STAGING"
+          API_DOMAIN="staging-pulsecontrol-api.yvonnegichovi.com"
+          ;;
+        main|master)
+          ENV_NAME="PRODUCTION"
+          API_DOMAIN="pulsecontrol-api.yvonnegichovi.com"
+          ;;
+        *)
+          echo "No deployment configured for branch '$BRANCH'. Skipping."
+          exit 0
+          ;;
+      esac
+
+      echo "========================================"
+      echo "Starting $ENV_NAME deployment (branch: $BRANCH)"
+      echo "========================================"
+
+      # ============================================================
+      # BACKEND (Django)
+      # ============================================================
+      DEPLOYPATH="$CPANEL_HOME/$API_DOMAIN"
+      VENV_PATH="$CPANEL_HOME/virtualenv/$API_DOMAIN/3.11/bin"
+
+      echo "---- Backend -> $DEPLOYPATH"
+
+      if [ ! -d "$REPO_DIR/backend" ]; then
+        echo "ERROR: backend/ not found in $REPO_DIR"
+        exit 1
+      fi
+
+      if [ ! -x "$VENV_PATH/python" ]; then
+        echo "ERROR: virtualenv not found at $VENV_PATH"
+        echo "Create the app in Setup Python App first."
+        exit 1
+      fi
+
+      mkdir -p "$DEPLOYPATH"
+      cp -a "$REPO_DIR/backend/." "$DEPLOYPATH/"
+
+      for f in manage.py requirements.txt; do
+        if [ ! -f "$DEPLOYPATH/$f" ]; then
+          echo "ERROR: $f was not deployed."
+          exit 1
+        fi
+      done
+
+      cd "$DEPLOYPATH"
+
+      # Deploy tasks do NOT receive the env vars set in Setup Python App.
+      if [ -f .env ]; then
+        set -a; . ./.env; set +a
+      else
+        echo "WARNING: $DEPLOYPATH/.env not found; Django may lack settings."
+      fi
+
+      echo "Installing Python dependencies..."
+      "$VENV_PATH/pip" install -r requirements.txt
+
+      echo "Running migrations..."
+      "$VENV_PATH/python" manage.py migrate --noinput
+
+      echo "Collecting static files..."
+      "$VENV_PATH/python" manage.py collectstatic --noinput
+
+      echo "Restarting application..."
+      mkdir -p tmp
+      touch tmp/restart.txt
+
+      echo "========================================"
+      echo "$ENV_NAME deployment completed"
+      echo "========================================"

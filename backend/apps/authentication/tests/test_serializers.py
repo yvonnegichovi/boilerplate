@@ -82,6 +82,7 @@ class UserSerializerTests(TestCase):
             "full_name",
             "phone_number",
             "avatar",
+            "is_staff",
             "date_joined",
         }
         self.assertEqual(set(data.keys()), expected)
